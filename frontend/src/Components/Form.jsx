@@ -3,6 +3,8 @@ import MuiButton from "./MuiButton"
 import { toast } from 'react-toastify'
 import SearchField from "./SearchField"
 import PersistentDrawerLeft from "./Sidebar"
+import { useDispatch } from "react-redux"
+import { setAllParas } from "../Slices/paragraphsSlice"
 
 
 const Form = () => {
@@ -15,6 +17,9 @@ const Form = () => {
     const [data, setData] = useState('')
     const [paragraphs, setParagraphs] = useState([])
     const [sortOrder, setSortOrder] = useState('asc')
+
+    //redux
+    const dispatch = useDispatch()
 
     //functions
     const handleSubmit = (e) => {
@@ -60,7 +65,10 @@ const Form = () => {
 
     const getDocs = async () => {
       const data = await fetch('http://localhost:3000/getAll');
+      
       const res = await data.json();
+      dispatch(setAllParas(res));
+      console.log(res, 'res')
       const sortedData = sortOrder === 'asc' ? res.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) : res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       console.log(sortedData, 'new sorted data')
       console.log(sortOrder, 'order')
