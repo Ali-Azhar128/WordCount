@@ -107,8 +107,6 @@ const Form = () => {
       getDocs()
     }, [sortOrder])
 
-    
-
     return (
         <div className="h-[100%] flex flex-col items-center justify-center">
           <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} toggle={toggleSortOrder}/>

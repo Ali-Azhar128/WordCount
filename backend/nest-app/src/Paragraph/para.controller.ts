@@ -51,8 +51,17 @@ export class ParaController{
     } catch (error) {
     console.log(error);
     return res.status(500).json(error);
-    }
-}
+    }}
+
+    @Get('/getPage')
+    async getPage(@Query('page') page: number, @Res() res: Response): Promise<any> {
+    try {
+    const docs = await this.paraService.getPage(page);
+    res.json(docs);
+    } catch (error) {
+    console.log(error);
+    return res.status(500).json(error);
+    }}
 
 }
 

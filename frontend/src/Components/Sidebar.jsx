@@ -16,7 +16,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
-
+import { Pagination, Stack } from '@mui/material';
 
 const drawerWidth = 240;
 
@@ -62,11 +62,38 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
+const ListContainer = styled('div')({
+  flex: 1,
+  overflowY: 'auto',
+});
+
+const PaginationContainer = styled('div')(({ theme }) => ({
+  borderTop: `1px solid ${theme.palette.divider}`,
+  padding: theme.spacing(1),
+  backgroundColor: theme.palette.background.paper,
+  '& .MuiPagination-ul': {
+    flexWrap: 'nowrap',
+    overflowX: 'auto',
+    '&::-webkit-scrollbar': {
+      height: '4px',
+    },
+    '&::-webkit-scrollbar-track': {
+      background: '#f1f1f1',
+    },
+    '&::-webkit-scrollbar-thumb': {
+      background: '#888',
+    },
+  },
+  '& .MuiPaginationItem-root': {
+    minWidth: '30px',
+    height: '30px',
+    fontSize: '0.8rem',
+  }
+}));
+
 export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-
-  
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -85,67 +112,83 @@ export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-      <CustomAppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{
-              mr: 2,
-              ...(open && { display: 'none' }),
-            }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            Word Count
-          </Typography>
-        </Toolbar>
-      </CustomAppBar>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
+    <div className="relative">
+      <Box sx={{ display: 'flex' }}>
+        <CssBaseline />
+        <CustomAppBar position="fixed" open={open}>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={{
+                mr: 2,
+                ...(open && { display: 'none' }),
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" noWrap component="div">
+              Word Count
+            </Typography>
+          </Toolbar>
+        </CustomAppBar>
+        <Drawer
+          sx={{
             width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={open}
-      >
-        <DrawerHeader className='w-full'>
-          <div className='flex justify-between items-center w-full'>
-            <IconButton onClick={toggle}>
-              <SortIcon />
-            </IconButton>
-            <IconButton className='' onClick={handleDrawerClose}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </div>
-          
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {paragraphs.map((text, index) => (
-            <ListItem key={index} disablePadding>
-              <ListItemButton onClick={() => {
-                console.log(text)
-                setText(text)
-              }}>
-                <ListItemText primary={truncateText(text, 10)} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-      <Main open={open}>
-      </Main>
-    </Box>
+            flexShrink: 0,
+            '& .MuiDrawer-paper': {
+              width: drawerWidth,
+              boxSizing: 'border-box',
+            },
+          }}
+          variant="persistent"
+          anchor="left"
+          open={open}
+        >
+          <DrawerHeader className="w-full">
+            <div className="flex justify-between items-center w-full">
+              <IconButton onClick={toggle}>
+                <SortIcon />
+              </IconButton>
+              <IconButton onClick={handleDrawerClose}>
+                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+              </IconButton>
+            </div>
+          </DrawerHeader>
+          <Divider />
+          <ListContainer>
+            <List>
+              {paragraphs.map((text, index) => (
+                <ListItem key={index} disablePadding>
+                  <ListItemButton
+                    onClick={() => {
+                      console.log(text);
+                      setText(text);
+                    }}
+                  >
+                    <ListItemText primary={truncateText(text, 10)} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </ListContainer>
+          <PaginationContainer>
+            <Stack spacing={0} alignItems="center">
+              <Pagination 
+                count={20} 
+                size="small"
+                siblingCount={0}
+                boundaryCount={1}
+                onChange={(event, page) => console.log(page)}
+                
+              />
+            </Stack>
+          </PaginationContainer>
+        </Drawer>
+        <Main open={open}></Main>
+      </Box>
+    </div>
   );
 }
