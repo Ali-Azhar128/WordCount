@@ -111,6 +111,10 @@ export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
     return text;
   };
 
+  useEffect(() => {
+    console.log(paragraphs, 'paragraphs')
+  }, [paragraphs])
+
   return (
     <div className="relative">
       <Box sx={{ display: 'flex' }}>

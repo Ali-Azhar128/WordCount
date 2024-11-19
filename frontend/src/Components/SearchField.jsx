@@ -1,14 +1,18 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const SearchField = ({ setParagraph }) => {
     const [open, setOpen] = useState(false);
     const [paragraphs, setParagraphs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedValue, setSelectedValue] = useState(null)
+
+    //redux
+    const paragraphsFromRedux = useSelector(state => state.paragraphs.paragraphs)
 
     const getDocs = async () => {
         try {
@@ -20,6 +24,15 @@ const SearchField = ({ setParagraph }) => {
             setParagraphs([]);
         }
     };
+
+    useEffect(() => {
+        
+            console.log(paragraphsFromRedux, 'from redux')
+             getDocs();
+      
+    }, [])
+
+
 
     const handleOpen = async() => {
         setOpen(true);
