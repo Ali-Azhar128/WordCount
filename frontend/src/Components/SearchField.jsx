@@ -3,16 +3,28 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { useSearchParagraphsQuery, useSearchParaWithPageNumberQuery  } from '../Slices/paragraphsApiSlice';
+import { setAllParas } from '../Slices/paragraphsSlice';
 
 const SearchField = ({ setParagraph }) => {
     const [open, setOpen] = useState(false);
     const [paragraphs, setParagraphs] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selectedValue, setSelectedValue] = useState(null)
+    const [search, setSearch] = useState('')
 
     //redux
+    // const { data: searchResults, isLoading, isError } = useSearchParagraphsQuery(search)
+    const pageNumber = useSelector(state => state.paragraphs.pageNumber)
     const paragraphsFromRedux = useSelector(state => state.paragraphs.paragraphs)
+    const { data: searchResultsWithPage, isLoading: isLoadingWithPage, isError: isErrorWithPage } = useSearchParaWithPageNumberQuery({
+        keyword: search, 
+        page: pageNumber
+    })
+
+
+    const dispatch = useDispatch()
 
     const getDocs = async () => {
         try {
@@ -27,10 +39,17 @@ const SearchField = ({ setParagraph }) => {
 
     useEffect(() => {
         
-            console.log(paragraphsFromRedux, 'from redux')
-             getDocs();
+            if(paragraphsFromRedux.length > 0){
+                console.log(paragraphsFromRedux, 'from redux')
+                getDocs();
+            }
       
-    }, [])
+    }, [paragraphsFromRedux])
+
+    useEffect(() => {
+        console.log(pageNumber, 'pageNumber')
+        console.log(searchResultsWithPage, 'searchResultsWithPage')
+    }, [searchResultsWithPage, pageNumber])
 
 
 
@@ -57,21 +76,12 @@ const SearchField = ({ setParagraph }) => {
         console.log('selected value: ', value.para)
       }
 
-      const searchDocs = async (keyword) => {
-        try {
-            const data = await fetch(`http://localhost:3000/search?keyword=${keyword}`)
-            const res = await data.json()
-            setParagraph(res.map(r => r.para))
-            console.log(res, 'search res')
-        } catch (error) {
-            setParagraphs([])
-        }
-      }
-
       const handleSearch = (event) => {
         const keyword = event.target.value
-        if(keyword){
-            searchDocs(keyword)
+        setSearch(keyword)
+        if(keyword && !isLoadingWithPage){
+            dispatch(setAllParas(searchResultsWithPage))
+
         } else{
             getDocs()
         }

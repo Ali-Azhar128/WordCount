@@ -17,6 +17,9 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
 import { Pagination, Stack } from '@mui/material';
+import { useGetPageQuery } from '../Slices/paragraphsApiSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 
 const drawerWidth = 240;
 
@@ -94,6 +97,12 @@ const PaginationContainer = styled('div')(({ theme }) => ({
 export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(1)
+
+  const dispatch = useDispatch();
+  const para = useSelector(state => state.paragraphs.paragraphs)
+  const pageNumber = useSelector(state => state.paragraphs.pageNumber)
+  const { data, error, isLoading, refetch } = useGetPageQuery(pageNumber);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -112,11 +121,31 @@ export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
   };
 
   useEffect(() => {
-    console.log(paragraphs, 'paragraphs')
-  }, [paragraphs])
+    if (data) {
+      dispatch(setAllParas(data))
+    }
+  }, [data, dispatch]);
+
+  // const getPage = (pageNumber) => {
+  //   try {
+      
+  //     setPage(pageNumber)
+  //     refetch()
+  //     dispatch(setAllParas(data))
+  //     console.log(para, 'para ff')
+  //     console.log(data, 'data')
+  //   } catch (error) {
+  //     console.error('Error fetching docs:', error);
+  //   }
+  // }
+
+  useEffect(() => {
+    console.log(para, 'para')
+  }, [para])
 
   return (
-    <div className="relative">
+    isLoading ? <div>Loading...</div> : (
+      <div className="relative">
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <CustomAppBar position="fixed" open={open}>
@@ -164,7 +193,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
           <Divider />
           <ListContainer>
             <List>
-              {paragraphs.map((text, index) => (
+              {para.map((text, index) => (
                 <ListItem key={index} disablePadding>
                   <ListItemButton
                     onClick={() => {
@@ -181,11 +210,15 @@ export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
           <PaginationContainer>
             <Stack spacing={0} alignItems="center">
               <Pagination 
+              page={pageNumber}
                 count={20} 
                 size="small"
                 siblingCount={0}
                 boundaryCount={1}
-                onChange={(event, page) => console.log(page)}
+                onChange={(event, page) =>{
+                  dispatch(setPageNumber(page))
+                  // getPage(page)
+                } }
                 
               />
             </Stack>
@@ -194,5 +227,6 @@ export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
         <Main open={open}></Main>
       </Box>
     </div>
-  );
+    )
+  )
 }

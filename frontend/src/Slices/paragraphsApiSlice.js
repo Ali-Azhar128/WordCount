@@ -6,8 +6,17 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
         query: () => "/getAll",
         }),
         searchParagraphs: builder.query({
-        query: (keyword) => `/search/${keyword}`,
+        query: (keyword) => `/search?${keyword}`,
         }),
+
+        getPage: builder.query({
+            query: (page) => `/getPage?page=${page}`,
+        }),
+
+        searchParaWithPageNumber: builder.query({
+          query: ({keyword, page}) => `/searchPage?keyword=${keyword}&page=${page}&perPage=5`,
+      }),
+
         addParagraph: builder.mutation({
         query: (newParagraph) => ({
             url: "/getCount",
@@ -19,4 +28,4 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
       overrideExisting: false,
     });
 
-    export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useAddParagraphMutation } = paragraphsApiSlice;
+    export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation } = paragraphsApiSlice;

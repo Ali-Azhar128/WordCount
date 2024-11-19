@@ -3,9 +3,9 @@ import MuiButton from "./MuiButton"
 import { toast } from 'react-toastify'
 import SearchField from "./SearchField"
 import PersistentDrawerLeft from "./Sidebar"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { setAllParas } from "../Slices/paragraphsSlice"
-import { useGetAllParagraphsQuery, useAddParagraphMutation } from "../Slices/paragraphsApiSlice"
+import { useGetAllParagraphsQuery, useAddParagraphMutation, useSearchParaWithPageNumberQuery } from "../Slices/paragraphsApiSlice"
 
 
 const Form = () => {
@@ -21,7 +21,13 @@ const Form = () => {
 
     //redux
     const dispatch = useDispatch()
-    const { data: docs, loading: loadingDocs, refetch } = useGetAllParagraphsQuery()
+    const paragraphsFromRedux = useSelector(state => state.paragraphs.paragraphs)
+    // const { data: docs, loading: loadingDocs, refetch } = useGetAllParagraphsQuery()
+    const pageNumber = useSelector(state => state.paragraphs.pageNumber)
+    const { data: docs, isLoading: loadingDocs, isError: isErrorWithPage } = useSearchParaWithPageNumberQuery({
+      keyword: '', 
+      page: pageNumber
+  })
     const [addParagraph, { isLoading, isError, data: addParagraphData }] = useAddParagraphMutation()
     //functions
     const handleSubmit = (e) => {
@@ -46,19 +52,21 @@ const Form = () => {
     }
 
     const getDocs = async () => {
-      const data = await fetch('http://localhost:3000/getAll');
-      const res = await data.json();
-      dispatch(setAllParas(res));
-      console.log(res, 'res');
-      const sortedData = sortOrder === 'asc'
-        ? [...res].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) // Create a copy before sorting
-        : [...res].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Create a copy before sorting
-      console.log(sortedData, 'new sorted data');
-      console.log(sortOrder, 'order');
-      setParagraphs(sortedData.map((r) => r.para));
-      console.log(paragraphs, 'paragraphs');
-      console.log(res, 'All Documents');
+        const sortedData = sortOrder === 'asc'
+        ? [...docs].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) // Create a copy before sorting
+        : [...docs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setParagraphs(sortedData.map((r) => r.para));
+        console.log(sortedData, 'sorted data')
+        dispatch(setAllParas(sortedData))
+        console.log(docs, 'docs api slice')
     };
+
+    //For reference
+    useEffect(() => {
+      if(!loadingDocs && docs) {
+        
+      }
+    }, [docs])
 
     const toggleSortOrder = () => {
       setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'))
@@ -95,17 +103,11 @@ const Form = () => {
     }, []);
 
     useEffect(() => {
+      console.log(docs, 'docsss')
       getDocs()
-    }, [sortOrder])
+    }, [sortOrder, loadingDocs, docs])
 
-    // useEffect(() => {
-    //   if(!loadingDocs) {
-    //     console.log(docs, 'docs api slice')
-    //   }
-    // }, [loadingDocs, docs])
-
-    
-
+   
     return (
         <div className="h-[100%] flex flex-col items-center justify-center">
           <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} toggle={toggleSortOrder}/>

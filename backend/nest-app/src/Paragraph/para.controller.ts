@@ -63,6 +63,30 @@ export class ParaController{
     return res.status(500).json(error);
     }}
 
+    @Get('searchPage')
+  async searchDocsWithPagination(
+    @Query('keyword') keyword: string,
+    @Query('page') page: number = 1,
+    @Query('perPage') perPage: number = 5,
+    @Res() res: Response
+  ): Promise<any> {
+    try {
+      let docs;
+      if (!keyword) {
+        docs = await this.paraService.getDocsWithPagination(Number(page), Number(perPage));
+      } else {
+        docs = await this.paraService.searchDocsWithPagination(keyword, Number(page), Number(perPage));
+      }
+      res.json(docs);
+    } catch (error) {
+      console.error('Search with pagination error:', error);
+      return res.status(500).json({
+        message: 'Internal server error',
+        error: error.message,
+      });
+    }
+  }
+
     
 
 }

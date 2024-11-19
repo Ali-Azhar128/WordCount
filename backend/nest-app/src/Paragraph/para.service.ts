@@ -165,4 +165,26 @@ export class ParaService {
         return this.paraModel.find({}).skip((page - 1) * perPage).limit(perPage).exec();
 
     }
+
+    async getDocsWithPagination(page: number = 1, perPage: number = 5): Promise<ParaDocument[]> {
+        const docs = await this.paraModel
+          .find()
+          .skip((page - 1) * perPage)
+          .limit(perPage)
+          .exec();
+    
+        return docs; // Return the array directly
+      }
+
+    async searchDocsWithPagination(keyword: string, page: number = 1, perPage: number = 5): Promise<ParaDocument[]> {
+        const regex = new RegExp(keyword, 'i');
+        
+        const docs = await this.paraModel
+          .find({ para: { $regex: regex } })
+          .skip((page - 1) * perPage)
+          .limit(perPage)
+          .exec();
+    
+        return docs; // Return the array directly
+      }
 }
