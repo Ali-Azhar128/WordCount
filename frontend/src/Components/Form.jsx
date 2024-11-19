@@ -49,11 +49,13 @@ const Form = () => {
       const data = await fetch('http://localhost:3000/getAll');
       const res = await data.json();
       dispatch(setAllParas(res));
-      console.log(res, 'res')
-      const sortedData = sortOrder === 'asc' ? res.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) : res.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      console.log(sortedData, 'new sorted data')
-      console.log(sortOrder, 'order')
-      setParagraphs(sortedData.map(r => r.para));
+      console.log(res, 'res');
+      const sortedData = sortOrder === 'asc'
+        ? [...res].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) // Create a copy before sorting
+        : [...res].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Create a copy before sorting
+      console.log(sortedData, 'new sorted data');
+      console.log(sortOrder, 'order');
+      setParagraphs(sortedData.map((r) => r.para));
       console.log(paragraphs, 'paragraphs');
       console.log(res, 'All Documents');
     };

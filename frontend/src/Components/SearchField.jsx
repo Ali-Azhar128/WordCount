@@ -26,10 +26,10 @@ const SearchField = ({ setParagraph }) => {
     };
 
     useEffect(() => {
-        setTimeout(() => {
+        
             console.log(paragraphsFromRedux, 'from redux')
              getDocs();
-        }, 3000)
+      
     }, [])
 
 
