@@ -63,5 +63,7 @@ export class ParaController{
     return res.status(500).json(error);
     }}
 
+    
+
 }
 

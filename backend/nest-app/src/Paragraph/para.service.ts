@@ -158,5 +158,11 @@ export class ParaService {
     async searchDocs(keyword: string): Promise<ParaDocument[]> {
         const regex = new RegExp(keyword, 'i'); 
         return this.paraModel.find({ para: { $regex: regex } }).exec();
-      }    
+      }  
+      
+    async getPage(page: number): Promise<ParaDocument[]> {
+        const perPage = 5;
+        return this.paraModel.find({}).skip((page - 1) * perPage).limit(perPage).exec();
+
+    }
 }
