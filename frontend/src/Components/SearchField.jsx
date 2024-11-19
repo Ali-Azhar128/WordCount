@@ -72,7 +72,6 @@ const SearchField = ({ setParagraph }) => {
         const keyword = event.target.value
         if(keyword){
             searchDocs(keyword)
-            console.log('looooooooooooog')
         } else{
             getDocs()
         }

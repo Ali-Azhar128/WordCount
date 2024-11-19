@@ -5,6 +5,7 @@ import SearchField from "./SearchField"
 import PersistentDrawerLeft from "./Sidebar"
 import { useDispatch } from "react-redux"
 import { setAllParas } from "../Slices/paragraphsSlice"
+import { useGetAllParagraphsQuery, useAddParagraphMutation } from "../Slices/paragraphsApiSlice"
 
 
 const Form = () => {
@@ -20,7 +21,8 @@ const Form = () => {
 
     //redux
     const dispatch = useDispatch()
-
+    const { data: docs, loading: loadingDocs, refetch } = useGetAllParagraphsQuery()
+    const [addParagraph, { isLoading, isError, data: addParagraphData }] = useAddParagraphMutation()
     //functions
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -29,43 +31,22 @@ const Form = () => {
     }
 
     const addData = async (text) => {
-        setLoading(true)
-        try {
-            const res = await fetch('http://localhost:3000/getCount', {
-                method: 'POST',
-                headers: {
-                    'Content-type': 'application/json'
-                },
-                body: JSON.stringify({paragraph: text, ip})
-            })
-            if (!res.ok) {
-                const errorData = await res.json();
-                const errorMessage = errorData.message || 'Something went wrong';
-                if (Array.isArray(errorMessage)) {
-                  throw new Error(errorMessage.map(err => err.errors.join(', ')).join(' | '));
-                } else {
-                  throw new Error(errorMessage);
-                }
-              }
-            const data = await res.json()
-            setCount(data.count)
-            console.log(data.pdfDownloadLink, 'link')
-            setUrl(`http://localhost:3000${data.pdfDownloadLink}`)
-            setData(data.pdfDownloadLink)
-            setText('')
-            setLoading(false)
-           
-        } catch (error) {
-            setLoading(false)
-            setCount(0)
-            console.log(error.message)
-            toast.error(error.message)
-        } 
+      try {
+
+        const result = await addParagraph({ paragraph: text, ip }).unwrap()
+        setCount(result.count)
+        setUrl(`http://localhost:3000${result.pdfDownloadLink}`)
+        setData(result.pdfDownloadLink)
+        setText('')
+      } catch (error) {
+        setCount(0)
+        console.log(error.message)
+        toast.error(error.message)
+      }
     }
 
     const getDocs = async () => {
       const data = await fetch('http://localhost:3000/getAll');
-      
       const res = await data.json();
       dispatch(setAllParas(res));
       console.log(res, 'res')
@@ -115,6 +96,12 @@ const Form = () => {
       getDocs()
     }, [sortOrder])
 
+    useEffect(() => {
+      if(!loadingDocs) {
+        console.log(docs, 'docs api slice')
+      }
+    }, [loadingDocs, docs])
+
     
 
     return (
@@ -126,7 +113,7 @@ const Form = () => {
                     <label className="text-2xl font-bold mb-4" htmlFor="para">Enter Your Paragraph</label>
                     <textarea className="text-white p-4" value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={50} id='para'/>
                 </div>
-                <MuiButton loading={loading} text={'submit'}/>
+                <MuiButton loading={isLoading} text={'submit'}/>
             </form>
             <div>
                 <p className="mt-2">Words in document: {count}</p>
