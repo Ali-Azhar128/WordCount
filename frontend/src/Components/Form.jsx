@@ -18,6 +18,7 @@ const Form = () => {
     const [data, setData] = useState('')
     const [paragraphs, setParagraphs] = useState([])
     const [sortOrder, setSortOrder] = useState('asc')
+    const [search, setSearch] = useState('');
 
     //redux
     const dispatch = useDispatch()
@@ -25,7 +26,7 @@ const Form = () => {
     // const { data: docs, loading: loadingDocs, refetch } = useGetAllParagraphsQuery()
     const pageNumber = useSelector(state => state.paragraphs.pageNumber)
     const { data: docs, isLoading: loadingDocs, isError: isErrorWithPage } = useSearchParaWithPageNumberQuery({
-      keyword: '', 
+      keyword: search ? search : '', 
       page: pageNumber
   })
     const [addParagraph, { isLoading, isError, data: addParagraphData }] = useAddParagraphMutation()
@@ -52,8 +53,9 @@ const Form = () => {
     }
 
     const getDocs = async () => {
+      console.log(docs, 'docs')
         const sortedData = sortOrder === 'asc'
-        ? [...docs].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)) // Create a copy before sorting
+        ? [...docs].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
         : [...docs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setParagraphs(sortedData.map((r) => r.para));
         console.log(sortedData, 'sorted data')
@@ -110,9 +112,9 @@ const Form = () => {
    
     return (
         <div className="h-[100%] flex flex-col items-center justify-center">
-          <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} toggle={toggleSortOrder}/>
-          <SearchField setParagraph={setParagraphs}/>
-            <form onSubmit={handleSubmit} className="form mt-20">
+          <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} setCount={setCount} setUrl={setUrl} toggle={toggleSortOrder} search={search} setSearch={setSearch}/>
+          {/* <SearchField setParagraph={setParagraphs}/> */}
+            <form onSubmit={handleSubmit} className="form mt-20" >
                 <div className="textInput flex flex-col">
                     <label className="text-2xl font-bold mb-4" htmlFor="para">Enter Your Paragraph</label>
                     <textarea className="text-white p-4" value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={50} id='para'/>

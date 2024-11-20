@@ -16,8 +16,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
-import { Pagination, Stack } from '@mui/material';
-import { useGetPageQuery } from '../Slices/paragraphsApiSlice';
+import { Chip, Pagination, Stack, TextField } from '@mui/material';
+import { useGetPageQuery, useSearchParaWithPageNumberQuery } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 
@@ -94,25 +94,36 @@ const PaginationContainer = styled('div')(({ theme }) => ({
   }
 }));
 
-export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
+export default function PersistentDrawerLeft({ paragraphs, setText, setCount, setUrl, toggle, search, setSearch }) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
 
   const dispatch = useDispatch();
-  const para = useSelector(state => state.paragraphs.paragraphs)
-  const pageNumber = useSelector(state => state.paragraphs.pageNumber)
-  const { data, error, isLoading, refetch } = useGetPageQuery(pageNumber);
+  const para = useSelector(state => state.paragraphs.paragraphs);
+  const pageNumber = useSelector(state => state.paragraphs.pageNumber);
+  const { data, error, isLoading } = useGetPageQuery(pageNumber);
+  const { data: searchResultsWithPage, isLoading: isLoadingWithPage } = useSearchParaWithPageNumberQuery({
+    keyword: search,
+    page: pageNumber
+  });
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
 
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const getDocs = async () => {
+    try {
+      const data = await fetch('http://localhost:3000/getAll');
+      const res = await data.json();
+      dispatch(setAllParas(res));
+    } catch (error) {
+      console.error('Error fetching docs:', error);
+      dispatch(setAllParas([]));
+    }
   };
 
   const truncateText = (text, maxWords) => {
+    if (typeof text !== 'string') return '';
     const words = text.split(' ');
     if (words.length > maxWords) {
       return `${words.slice(0, maxWords).join(' ')}...`;
@@ -120,113 +131,124 @@ export default function PersistentDrawerLeft({ paragraphs, setText, toggle }) {
     return text;
   };
 
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   useEffect(() => {
     if (data) {
-      dispatch(setAllParas(data))
+      dispatch(setAllParas(data));
     }
   }, [data, dispatch]);
-
-  // const getPage = (pageNumber) => {
-  //   try {
-      
-  //     setPage(pageNumber)
-  //     refetch()
-  //     dispatch(setAllParas(data))
-  //     console.log(para, 'para ff')
-  //     console.log(data, 'data')
-  //   } catch (error) {
-  //     console.error('Error fetching docs:', error);
-  //   }
-  // }
-
-  useEffect(() => {
-    console.log(para, 'para')
-  }, [para])
 
   return (
     isLoading ? <div>Loading...</div> : (
       <div className="relative">
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <CustomAppBar position="fixed" open={open}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{
-                mr: 2,
-                ...(open && { display: 'none' }),
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              Word Count
-            </Typography>
-          </Toolbar>
-        </CustomAppBar>
-        <Drawer
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
+        <Box sx={{ display: 'flex' }}>
+          <CssBaseline />
+          <CustomAppBar position="fixed" open={open}>
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{ mr: 2, ...(open && { display: 'none' }) }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography variant="h6" noWrap component="div">
+                Word Count
+              </Typography>
+            </Toolbar>
+          </CustomAppBar>
+          <Drawer
+            sx={{
               width: drawerWidth,
-              boxSizing: 'border-box',
-            },
-          }}
-          variant="persistent"
-          anchor="left"
-          open={open}
-        >
-          <DrawerHeader className="w-full">
-            <div className="flex justify-between items-center w-full">
-              <IconButton onClick={toggle}>
-                <SortIcon />
-              </IconButton>
-              <IconButton onClick={handleDrawerClose}>
-                {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-              </IconButton>
-            </div>
-          </DrawerHeader>
-          <Divider />
-          <ListContainer>
-            <List>
-              {para.map((text, index) => (
-                <ListItem key={index} disablePadding>
-                  <ListItemButton
-                    onClick={() => {
-                      console.log(text);
-                      setText(text);
-                    }}
-                  >
-                    <ListItemText primary={truncateText(text, 10)} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </ListContainer>
-          <PaginationContainer>
-            <Stack spacing={0} alignItems="center">
-              <Pagination 
-              page={pageNumber}
-                count={20} 
+              flexShrink: 0,
+              '& .MuiDrawer-paper': {
+                width: drawerWidth,
+                boxSizing: 'border-box',
+              },
+            }}
+            variant="persistent"
+            anchor="left"
+            open={open}
+          >
+            <DrawerHeader className="w-full">
+              <div className="flex justify-between items-center w-full">
+                <IconButton onClick={toggle}>
+                  <SortIcon />
+                </IconButton>
+                <IconButton onClick={handleDrawerClose}>
+                  {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </IconButton>
+              </div>
+            </DrawerHeader>
+            <div className="px-2 py-2">
+              <TextField
+                fullWidth
                 size="small"
-                siblingCount={0}
-                boundaryCount={1}
-                onChange={(event, page) =>{
-                  dispatch(setPageNumber(page))
-                  // getPage(page)
-                } }
-                
+                label="Search Documents"
+                onChange={(e) => {
+                  const keyword = e.target.value;
+                  setSearch(keyword);
+                  if (keyword && !isLoadingWithPage) {
+                    dispatch(setAllParas(searchResultsWithPage));
+                  } else {
+                    getDocs();
+                  }
+                }}
+                InputProps={{
+                  sx: {
+                    fontSize: '0.875rem',
+                  },
+                }}
               />
-            </Stack>
-          </PaginationContainer>
-        </Drawer>
-        <Main open={open}></Main>
-      </Box>
-    </div>
+            </div>
+            <Divider />
+            <ListContainer>
+              <List>
+                {para.map((text, index) => (
+                  <ListItem key={index} disablePadding>
+                    <ListItemButton onClick={() => {
+                      setText(text.para)
+                      setCount(text.count)
+                    }}>
+                      <ListItemText 
+                        primary={
+                          <div className='flex flex-col' style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span>{truncateText(text.para, 10)}</span>
+                            <Chip 
+                              sx={{ marginTop: '5px', alignSelf: 'flex-end' }}
+                              label={formatDate(text.createdAt)} 
+                              size="small" 
+                            />
+                          </div>
+                        } 
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            </ListContainer>
+            <PaginationContainer>
+              <Stack spacing={0} alignItems="center">
+                <Pagination 
+                  page={pageNumber}
+                  count={20} 
+                  size="small"
+                  siblingCount={0}
+                  boundaryCount={1}
+                  onChange={(event, page) => dispatch(setPageNumber(page))}
+                />
+              </Stack>
+            </PaginationContainer>
+          </Drawer>
+          <Main open={open}></Main>
+        </Box>
+      </div>
     )
-  )
+  );
 }
