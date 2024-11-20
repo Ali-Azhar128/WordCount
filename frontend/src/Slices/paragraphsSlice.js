@@ -12,12 +12,13 @@ export const paragraphSlice = createSlice({
       state.paragraphs = [];
       
       // Extract para property from each object and add to state
-      console.log(action.payload, 'action.payload')
+      console.log(action.payload.docs, 'action.payload')
       action.payload.map(item => {
         const newItem = {
-          para: item.para,
+          para: item.paragraph,
           createdAt: item.createdAt,
           count: item.count,
+          pdfLink: item.pdfLink,
         }
         state.paragraphs.push(newItem);
       });

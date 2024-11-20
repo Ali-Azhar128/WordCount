@@ -23,8 +23,8 @@ export class ParaController{
         
         Promise<any> {
         try {
-            const { count } = await this.paraService.getCount(createparaDto)
-            const filename = await this.pdfService.generatePDF(createparaDto.paragraph, count)
+            const { count, id } = await this.paraService.getCount(createparaDto)
+            const filename = await this.pdfService.generatePDF(id, createparaDto.paragraph, count)
             const pdfDownloadLink = `/public/PDFs/${filename}`
             console.log(pdfDownloadLink, 'pdfDownloadLink')
             return res.json({count, pdfDownloadLink})

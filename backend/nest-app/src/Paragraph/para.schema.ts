@@ -5,17 +5,21 @@ export type ParaDocument = Paragraph & Document
 
 @Schema({ timestamps: true })
 export class Paragraph{
-    @Prop({required: true})
-    para: string
-
-    @Prop({required: true})
-    ip: string
-
     @Prop({ required: true })
-    count: number
+  paragraph: string;
 
-    @Prop()
-    createdAt: Date
+  @Prop({ required: true })
+  ip: string;
+
+  @Prop({ required: true })
+  count: number;
+
+  @Prop()
+  pdfLink?: string;
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
+
 }
 
 export const ParaSchema = SchemaFactory.createForClass(Paragraph)

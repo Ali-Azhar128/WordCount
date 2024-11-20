@@ -1,6 +1,6 @@
 import LoadingButton from '@mui/lab/LoadingButton';
 
-const MuiButton = ({ url, text, loading = false, onClick }) => {
+const MuiButton = ({ url, text, loading = false, onClick, refetch }) => {
   return (
     <div>
       {url ? (
@@ -24,6 +24,10 @@ const MuiButton = ({ url, text, loading = false, onClick }) => {
        </LoadingButton>
       ) : (
         <LoadingButton
+        onClick={() => {
+          console.log('hereeee')
+          refetch()
+        }}
           loading={loading}
           type="submit"
           variant="contained"

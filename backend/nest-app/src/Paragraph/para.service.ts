@@ -7,6 +7,7 @@ import * as winkTokenizer from 'wink-tokenizer'
 import * as TinySegmenter from 'tiny-segmenter'
 import * as nodejieba from 'nodejieba';
 import * as contractions from 'contractions';
+import { ParaDOW } from "./paragraphDow.service";
 
 interface Token {
     value: string,
@@ -19,7 +20,8 @@ export class ParaService {
     private segmenter: any
     private specialCharacters: string[]
 
-    constructor(@InjectModel(Paragraph.name) private paraModel: Model<ParaDocument>) {
+    constructor(@InjectModel(Paragraph.name) private paraModel: Model<ParaDocument>, private readonly paraDow: ParaDOW) {
+
         this.tokenizer = new winkTokenizer()
         this.segmenter = new TinySegmenter()
         this.specialCharacters = ['\n', '!', '？', ',', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '\\', '|', ';', ':', '\'', '"', ',', '.', '<', '>', '/', '?', '`', '~', '，'];
@@ -110,7 +112,7 @@ export class ParaService {
         return segments;
     }
 
-    async getCount(createParaDto: CreateParaDto): Promise<{ count: number }> {
+    async getCount(createParaDto: CreateParaDto): Promise<{ count: number, id: string }> {
         const { paragraph, ip } = createParaDto;
         const preprocessedParagraph = contractions.expand(paragraph);
         let tokens: string[] = [];
@@ -141,23 +143,22 @@ export class ParaService {
 
         console.log(tokens);
         let count = tokens.length;
-        const createdPara = new this.paraModel({
-            para: paragraph, ip, count
-        });
-        await createdPara.save();
-        return { count };
+
+        const savedPara = await this.paraDow.create({ paragraph, ip, count });
+        await savedPara.save();
+        return { count, id: savedPara.id };
     }
 
     async getAllDocs(): Promise<{para: string, createdAt: Date}[]>{
         const docs = await this.paraModel.find({})
         let data: {para: string, createdAt: Date}[] = [];
-        docs.map((d) => data.push({para: d.para, createdAt: d.createdAt}));
+        docs.map((d) => data.push({para: d.paragraph, createdAt: d.createdAt}));
         return data
     }
 
     async searchDocs(keyword: string): Promise<ParaDocument[]> {
         const regex = new RegExp(keyword, 'i'); 
-        return this.paraModel.find({ para: { $regex: regex } }).exec();
+        return this.paraModel.find({ paragraph: { $regex: regex } }).exec();
       }  
       
     async getPage(page: number): Promise<ParaDocument[]> {
@@ -166,25 +167,30 @@ export class ParaService {
 
     }
 
-    async getDocsWithPagination(page: number = 1, perPage: number = 5): Promise<ParaDocument[]> {
+    async getDocsWithPagination(page: number = 1, perPage: number = 5): Promise<any> {
+        const totalDocs = await this.paraModel.countDocuments().exec();
         const docs = await this.paraModel
           .find()
           .skip((page - 1) * perPage)
           .limit(perPage)
           .exec();
-    
-        return docs; // Return the array directly
+          const totalPages = Math.ceil(totalDocs / perPage);
+        return {docs, totalPages}; 
       }
 
-    async searchDocsWithPagination(keyword: string, page: number = 1, perPage: number = 5): Promise<ParaDocument[]> {
+      async searchDocsWithPagination(keyword: string, page: number = 1, perPage: number = 5): Promise<{ docs: ParaDocument[], totalPages: number }> {
         const regex = new RegExp(keyword, 'i');
         
-        const docs = await this.paraModel
-          .find({ para: { $regex: regex } })
-          .skip((page - 1) * perPage)
-          .limit(perPage)
-          .exec();
-    
-        return docs; // Return the array directly
-      }
+        const totalDocs = await this.paraModel.countDocuments({ paragraph: { $regex: regex } }).exec();
+        
+        const totalPages = Math.ceil(totalDocs / perPage);
+        
+        const docs = await this.paraModel.aggregate([
+            { $skip: (page - 1) * perPage },
+            { $match: { paragraph: { $regex: regex } } },
+            { $limit: perPage }
+          ]).exec();
+        
+        return { docs, totalPages };
+    }
 }

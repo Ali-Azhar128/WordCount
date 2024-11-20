@@ -21,6 +21,7 @@ import { useGetPageQuery, useSearchParaWithPageNumberQuery } from '../Slices/par
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 
+
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
@@ -143,7 +144,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   }, [data, dispatch]);
 
   return (
-    isLoading ? <div>Loading...</div> : (
+    isLoading && isLoadingWithPage ? <div>Loading...</div> : (
       <div className="relative">
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
@@ -195,9 +196,9 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                   const keyword = e.target.value;
                   setSearch(keyword);
                   if (keyword && !isLoadingWithPage) {
-                    dispatch(setAllParas(searchResultsWithPage));
+                    dispatch(setAllParas(searchResultsWithPage.docs));
                   } else {
-                    getDocs();
+                    // getDocs();
                   }
                 }}
                 InputProps={{
@@ -215,6 +216,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                     <ListItemButton onClick={() => {
                       setText(text.para)
                       setCount(text.count)
+                      setUrl(text.pdfLink)
                     }}>
                       <ListItemText 
                         primary={
@@ -237,7 +239,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
               <Stack spacing={0} alignItems="center">
                 <Pagination 
                   page={pageNumber}
-                  count={20} 
+                  count={!isLoadingWithPage && searchResultsWithPage ? searchResultsWithPage.totalPages : 0} 
                   size="small"
                   siblingCount={0}
                   boundaryCount={1}

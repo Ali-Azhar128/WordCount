@@ -25,7 +25,7 @@ const Form = () => {
     const paragraphsFromRedux = useSelector(state => state.paragraphs.paragraphs)
     // const { data: docs, loading: loadingDocs, refetch } = useGetAllParagraphsQuery()
     const pageNumber = useSelector(state => state.paragraphs.pageNumber)
-    const { data: docs, isLoading: loadingDocs, isError: isErrorWithPage } = useSearchParaWithPageNumberQuery({
+    const { data: docs, isLoading: loadingDocs, isError: isErrorWithPage, refetch } = useSearchParaWithPageNumberQuery({
       keyword: search ? search : '', 
       page: pageNumber
   })
@@ -34,7 +34,6 @@ const Form = () => {
     const handleSubmit = (e) => {
         e.preventDefault()
         addData(text)
-
     }
 
     const addData = async (text) => {
@@ -55,8 +54,8 @@ const Form = () => {
     const getDocs = async () => {
       console.log(docs, 'docs')
         const sortedData = sortOrder === 'asc'
-        ? [...docs].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-        : [...docs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        ? [...docs.docs].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+        : [...docs.docs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setParagraphs(sortedData.map((r) => r.para));
         console.log(sortedData, 'sorted data')
         dispatch(setAllParas(sortedData))
@@ -106,7 +105,9 @@ const Form = () => {
 
     useEffect(() => {
       console.log(docs, 'docsss')
-      getDocs()
+      if(docs){
+        getDocs()
+      }
     }, [sortOrder, loadingDocs, docs])
 
    
@@ -119,7 +120,7 @@ const Form = () => {
                     <label className="text-2xl font-bold mb-4" htmlFor="para">Enter Your Paragraph</label>
                     <textarea className="text-white p-4" value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={50} id='para'/>
                 </div>
-                <MuiButton loading={isLoading} text={'submit'}/>
+                <MuiButton loading={isLoading} text={'submit'} refetch={refetch}/>
             </form>
             <div>
                 <p className="mt-2">Words in document: {count}</p>
