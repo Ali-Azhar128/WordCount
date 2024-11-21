@@ -20,6 +20,9 @@ export class Paragraph{
   @Prop({ default: Date.now })
   createdAt: Date;
 
+  @Prop()
+  language: string;
+
 }
 
 export const ParaSchema = SchemaFactory.createForClass(Paragraph)

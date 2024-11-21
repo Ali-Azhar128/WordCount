@@ -19,7 +19,9 @@ export const paragraphSlice = createSlice({
           createdAt: item.createdAt,
           count: item.count,
           pdfLink: item.pdfLink,
+          language: item.language,
         }
+        console.log(newItem, 'newItem')
         state.paragraphs.push(newItem);
       });
       

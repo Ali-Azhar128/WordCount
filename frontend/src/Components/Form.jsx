@@ -106,6 +106,7 @@ const Form = () => {
     useEffect(() => {
       console.log(docs, 'docsss')
       if(docs){
+        refetch()
         getDocs()
       }
     }, [sortOrder, loadingDocs, docs])
@@ -113,7 +114,7 @@ const Form = () => {
    
     return (
         <div className="h-[100%] flex flex-col items-center justify-center">
-          <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} setCount={setCount} setUrl={setUrl} toggle={toggleSortOrder} search={search} setSearch={setSearch}/>
+          <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} setCount={setCount} setUrl={setUrl} toggle={toggleSortOrder} search={search} setSearch={setSearch} setData={setData}/>
           {/* <SearchField setParagraph={setParagraphs}/> */}
             <form onSubmit={handleSubmit} className="form mt-20" >
                 <div className="textInput flex flex-col">
@@ -127,7 +128,7 @@ const Form = () => {
             </div>
             {url && 
             <>
-                <MuiButton text={'Download PDF'} url={url} onClick={onClick}/>
+                <MuiButton text={'Download PDF'} url={url} onClick={onClick} />
             </>}
         </div>
     )

@@ -20,6 +20,7 @@ import { Chip, Pagination, Stack, TextField } from '@mui/material';
 import { useGetPageQuery, useSearchParaWithPageNumberQuery } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
+import LanguageIcon from '@mui/icons-material/Language';
 
 
 const drawerWidth = 240;
@@ -95,7 +96,7 @@ const PaginationContainer = styled('div')(({ theme }) => ({
   }
 }));
 
-export default function PersistentDrawerLeft({ paragraphs, setText, setCount, setUrl, toggle, search, setSearch }) {
+export default function PersistentDrawerLeft({ paragraphs, setText, setCount, setUrl, toggle, search, setSearch, setData }) {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
@@ -104,7 +105,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const para = useSelector(state => state.paragraphs.paragraphs);
   const pageNumber = useSelector(state => state.paragraphs.pageNumber);
   const { data, error, isLoading } = useGetPageQuery(pageNumber);
-  const { data: searchResultsWithPage, isLoading: isLoadingWithPage } = useSearchParaWithPageNumberQuery({
+  const { data: searchResultsWithPage, isLoading: isLoadingWithPage, refetch } = useSearchParaWithPageNumberQuery({
     keyword: search,
     page: pageNumber
   });
@@ -217,16 +218,26 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                       setText(text.para)
                       setCount(text.count)
                       setUrl(text.pdfLink)
+                      const cleanedUrl = text.pdfLink.split('3000')[1];
+                      setData(cleanedUrl)
                     }}>
                       <ListItemText 
                         primary={
                           <div className='flex flex-col' style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <span>{truncateText(text.para, 10)}</span>
-                            <Chip 
-                              sx={{ marginTop: '5px', alignSelf: 'flex-end' }}
-                              label={formatDate(text.createdAt)} 
-                              size="small" 
-                            />
+                            <div className='flex space-x-1 justify-end'>
+                              <Chip
+                               icon={<LanguageIcon />}
+                              sx={{ marginTop: '5px', alignSelf: 'flex-end', variant: 'outlined' }}
+                              label={text.language ? text.language :'No lang'} 
+                              size="small"
+                              />
+                              <Chip 
+                                sx={{ marginTop: '5px', alignSelf: 'flex-end' }}
+                                label={formatDate(text.createdAt)} 
+                                size="small" 
+                              />
+                            </div>
                           </div>
                         } 
                       />

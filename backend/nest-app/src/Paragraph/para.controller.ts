@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
-import { ParaService } from "./para.service";
-import { CreateParaDto } from "./create-para.dto";
+import { ParaService } from "./para.service.js";
+import { CreateParaDto } from "./create-para.dto.js";
 import { Request, Response } from "express";
-import { NoSpecialCharactersGuard } from "./Guards/no-special-char-guard.guard";
-import { PdfService } from "./pdf.service";
+import { NoSpecialCharactersGuard } from "./Guards/no-special-char-guard.guard.js";
+import { PdfService } from "./pdf.service.js";
 
 @Controller()
 export class ParaController{

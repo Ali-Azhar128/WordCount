@@ -1,13 +1,15 @@
 import { Injectable } from "@nestjs/common";
-import { CreateParaDto } from "./create-para.dto";
-import { ParaDocument, Paragraph } from "./para.schema";
+import { CreateParaDto } from "./create-para.dto.js";
+import { ParaDocument, Paragraph } from "./para.schema.js";
 import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import * as winkTokenizer from 'wink-tokenizer'
-import * as TinySegmenter from 'tiny-segmenter'
-import * as nodejieba from 'nodejieba';
-import * as contractions from 'contractions';
-import { ParaDOW } from "./paragraphDow.service";
+import winkTokenizer from 'wink-tokenizer'
+import TinySegmenter from 'tiny-segmenter'
+import nodejieba from 'nodejieba';
+import contractions from 'contractions';
+import { ParaDOW } from "./paragraphDow.service.js";
+import { franc } from "franc";
+import {iso6392} from 'iso-639-2'
 
 interface Token {
     value: string,
@@ -117,6 +119,13 @@ export class ParaService {
         const preprocessedParagraph = contractions.expand(paragraph);
         let tokens: string[] = [];
 
+        const languageCode = franc(preprocessedParagraph);
+        console.log(languageCode, 'code')
+        const languageObj = iso6392.find(lang => lang.iso6392B === languageCode);
+        const language = languageObj ? languageObj.name : 'unknown';
+        console.log(`Detected language: ${language}`);
+
+
         // Split the text into language segments
         const segments = this.splitMixedText(preprocessedParagraph);
         
@@ -144,7 +153,7 @@ export class ParaService {
         console.log(tokens);
         let count = tokens.length;
 
-        const savedPara = await this.paraDow.create({ paragraph, ip, count });
+        const savedPara = await this.paraDow.create({ paragraph, ip, count, language });
         await savedPara.save();
         return { count, id: savedPara.id };
     }
