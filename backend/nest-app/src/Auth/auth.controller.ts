@@ -16,11 +16,10 @@ export class AuthController{
         @Res() res: Response
     ){
         try {
-            console.log('object')
             const user = await this.authService.signIn(authDto)
             return res.json(user);
         } catch (error) {
-            return res.status(400).json
+            return res.status(400).json({message: error.message})
         }
     }
     
