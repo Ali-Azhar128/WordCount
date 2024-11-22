@@ -27,7 +27,6 @@ const MuiButton = ({ url, text, loading = false, onClick, refetch }) => {
       ) : (
         <LoadingButton
         onClick={() => {
-          console.log('hereeee')
           refetch()
         }}
           loading={loading}
