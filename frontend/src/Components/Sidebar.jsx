@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
 import FlagIcon from '@mui/icons-material/Flag';
+import { toast } from 'react-toastify';
 
 
 const drawerWidth = 240;
@@ -103,15 +104,18 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const [page, setPage] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // redux
   const dispatch = useDispatch();
   const para = useSelector(state => state.paragraphs.paragraphs);
   const user = useSelector(state => state.login.userInfo)
   const pageNumber = useSelector(state => state.paragraphs.pageNumber);
-  const { data, error, isLoading } = useGetPageQuery(pageNumber);
+
+  const { data, error, isLoading, refetch: refetchPage } = useGetPageQuery(pageNumber);
   const { data: searchResultsWithPage, isLoading: isLoadingWithPage, refetch } = useSearchParaWithPageNumberQuery({
     keyword: search,
     page: pageNumber
   });
+  const [flagItem, {isLoading: flagItemLoading, isError}] = useFlagItemMutation();
 
  
   
@@ -129,8 +133,15 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
     }
   };
 
-  const flagItem = () => {
-
+  const toggleFlagItem = async (e, id) => {
+    e.stopPropagation()
+    try {
+      const res = await flagItem(id).unwrap();
+      toast.success(res)
+      refetchPage()
+    } catch (error) {
+      toast.error(error);
+    }
   }
 
   const truncateText = (text, maxWords) => {
@@ -277,7 +288,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                             {
                               user && ( 
                                 user.role === 'admin' && (
-                                  <FlagIcon onClick={flagItem} sx={{ color: text.isFlagged ? 'white' : 'red' }} />
+                                  <FlagIcon onClick={(e) => toggleFlagItem(e, text.id)} sx={{ color: text.isFlagged ? 'white' : 'red' }} />
                                 )
                               )
                             }
