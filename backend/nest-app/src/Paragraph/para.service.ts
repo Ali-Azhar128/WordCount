@@ -204,12 +204,16 @@ export class ParaService {
     }
 
     async flagItem(id: string): Promise<string> {
-        const doc = await this.paraDow.find(id); // Pass just the id string
+        const doc = await this.paraDow.find(id); 
         if (!doc) {
             throw new Error('Document not found');
         }
-        doc.isFlagged = true;
-        await doc.save(); // Make sure to save the changes
+        doc.isFlagged = !doc.isFlagged;
+        await doc.save();
         return 'Document flagged';
+    }
+
+    async deleteItem(id: string): Promise<any>{
+        const doc = await this.paraDow.delete(id)
     }
 }

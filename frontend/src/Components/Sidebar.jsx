@@ -288,21 +288,21 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                             {
                               user && ( 
                                 user.role === 'admin' && (
-                                  <FlagIcon onClick={(e) => toggleFlagItem(e, text.id)} sx={{ color: text.isFlagged ? 'white' : 'red' }} />
+                                  <FlagIcon onClick={(e) => toggleFlagItem(e, text.id)} sx={{ color: text.isFlagged ? 'white' : 'black' }} />
                                 )
                               )
                             }
-
                             </div>
                             <div className='flex space-x-1 justify-end'>
                               <Chip
+
                                 icon={<LanguageIcon/>}
-                                sx={{ marginTop: '5px', alignSelf: 'flex-end', variant: 'outlined'}}
+                                sx={{ marginTop: '5px', alignSelf: 'flex-end', variant: 'outlined', backgroundColor: 'yellow' }}
                                 label={text.language ? text.language : 'No lang'} 
                                 size="small"
                               />
                               <Chip 
-                                sx={{ marginTop: '5px', alignSelf: 'flex-end' }}
+                                sx={{ marginTop: '5px', alignSelf: 'flex-end', backgroundColor: '#E0E0E0' }}
                                 label={formatDate(text.createdAt)} 
                                 size="small" 
                               />

@@ -24,8 +24,15 @@ export class ParaDOW {
     }
 
     async find(id: string | {id: string}): Promise<ParaDocument>{
-        console.log(id, 'iddd')
         return await this.paraModel.findById(id).exec();
+    }
+
+    async delete(id: string | {id: string}): Promise<any>{
+        const doc = await this.paraModel.findByIdAndDelete(id).exec();
+        if(!doc){
+            throw new Error('Document not found');
+        }
+        
     }
 
    
