@@ -153,7 +153,7 @@ export class ParaService {
         console.log(tokens);
         let count = tokens.length;
 
-        const savedPara = await this.paraDow.create({ paragraph, ip, count, language });
+        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false });
         await savedPara.save();
         return { count, id: savedPara.id };
     }
@@ -201,5 +201,15 @@ export class ParaService {
           ]).exec();
         
         return { docs, totalPages };
+    }
+
+    async flagItem(id: string): Promise<string> {
+        const doc = await this.paraDow.find(id); // Pass just the id string
+        if (!doc) {
+            throw new Error('Document not found');
+        }
+        doc.isFlagged = true;
+        await doc.save(); // Make sure to save the changes
+        return 'Document flagged';
     }
 }

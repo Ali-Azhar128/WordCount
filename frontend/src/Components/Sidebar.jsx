@@ -21,6 +21,7 @@ import { useGetPageQuery, useSearchParaWithPageNumberQuery } from '../Slices/par
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
+import FlagIcon from '@mui/icons-material/Flag';
 
 
 const drawerWidth = 240;
@@ -266,7 +267,19 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                       <ListItemText 
                         primary={
                           <div className='flex flex-col' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>{truncateText(text.para, 10)}</span>
+                            <div className='flex justify-between'>
+                              <span>{truncateText(text.para, 10)}</span>
+                             {
+                              user.role === 'admin' && (
+                                <FlagIcon onClick={(e) => {
+                                  e.stopPropagation();
+                                  console.log(text.id, 'id')
+  
+                                }} sx={{ color: 'red' }} />
+                              )
+                             }
+
+                            </div>
                             <div className='flex space-x-1 justify-end'>
                               <Chip
                                icon={<LanguageIcon />}

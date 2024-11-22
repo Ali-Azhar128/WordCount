@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import store from './store/store.js'
 import {
   createBrowserRouter,
+  Navigate,
   RouterProvider,
 } from "react-router-dom";
 import MainPage from './Pages/MainPage.jsx'
@@ -15,12 +16,16 @@ import LoginPage from './Pages/LoginPage.jsx'
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <MainPage/>
+    element: <Navigate to="/login"/>,
   },
   {
     path: '/login',
     element: <LoginPage/>
-  }
+  },
+  {
+    path: '/main',
+    element: <MainPage />,
+  },
 ])
 
 createRoot(document.getElementById('root')).render(

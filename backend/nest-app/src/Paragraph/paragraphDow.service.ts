@@ -23,5 +23,10 @@ export class ParaDOW {
             .exec();
     }
 
+    async find(id: string | {id: string}): Promise<ParaDocument>{
+        console.log(id, 'iddd')
+        return await this.paraModel.findById(id).exec();
+    }
+
    
 }

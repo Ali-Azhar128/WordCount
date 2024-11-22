@@ -20,6 +20,7 @@ export const paragraphSlice = createSlice({
           count: item.count,
           pdfLink: item.pdfLink,
           language: item.language,
+          id: item._id
         }
         console.log(newItem, 'newItem')
         state.paragraphs.push(newItem);
