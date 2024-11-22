@@ -1,4 +1,5 @@
 import LoadingButton from '@mui/lab/LoadingButton';
+import { CircularProgress } from '@mui/material';
 
 const MuiButton = ({ url, text, loading = false, onClick, refetch }) => {
   return (
@@ -9,6 +10,7 @@ const MuiButton = ({ url, text, loading = false, onClick, refetch }) => {
          type="button"
          onClick={onClick}
          variant="contained"
+         
          sx={{
            mt: 2,
            '&:hover': {
@@ -16,7 +18,7 @@ const MuiButton = ({ url, text, loading = false, onClick, refetch }) => {
              color: 'white', 
            },
            '&.MuiLoadingButton-loading': {
-             backgroundColor: '#1565C0',
+             backgroundColor: 'red',
            },
          }}
        >
@@ -31,6 +33,7 @@ const MuiButton = ({ url, text, loading = false, onClick, refetch }) => {
           loading={loading}
           type="submit"
           variant="contained"
+          loadingIndicator={<CircularProgress color="red" size={24} />}
           sx={{
             mt: 2,
             '&.MuiLoadingButton-loading': {

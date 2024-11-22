@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import TextField from '@mui/material/TextField'
-import { Button, Container, Typography, Box, Paper, Avatar } from '@mui/material';
+import { Button, Container, Typography, Box, Paper, Avatar, Divider } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useLoginMutation } from '../../Slices/usersApiSlices'
 import { toast } from 'react-toastify'
@@ -33,12 +33,22 @@ const LoginForm = () => {
     }
   };
 
+  const handleGuestLogin = () => {
+    // Handle guest login logic here
+    navigate('/main'); // Navigate to the main page for guest login
+  };
+
 
   return (
     <Container component="main" maxWidth="xs">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 8 }}>
         <Box display="flex" flexDirection="column" alignItems="center">
-          <Typography component="h1" variant="h5">
+        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5" sx={{
+            fontWeight: 'bold',
+          }}>
             Sign In
           </Typography>
           <Typography component="h7" variant="h7">
@@ -73,11 +83,20 @@ const LoginForm = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 3, mb: 2, fontWeight: 'bold' }}
               disabled={isLoading}
             >
               {isLoading ? 'Logging in...' : 'Sign In'}
             </LoadingButton>
+            <Divider sx={{ width: '100%', my: 2 }} />
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={handleGuestLogin}
+            sx={{ mt: 1, mb: 2 }}
+          >
+            Sign In as Guest
+          </Button>
           </Box>
         </Box>
       </Paper>

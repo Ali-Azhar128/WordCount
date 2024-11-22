@@ -16,14 +16,17 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
-import { Button, Chip, Pagination, Stack, TextField } from '@mui/material';
+import { Button, Chip, Pagination, Stack, TextField, Tooltip } from '@mui/material';
 import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation, useDeleteItemMutation } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
 import FlagIcon from '@mui/icons-material/Flag';
 import DeleteIcon from '@mui/icons-material/Delete';
+import WarningIcon from '@mui/icons-material/Warning';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 
 const drawerWidth = 240;
@@ -120,7 +123,8 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const [flagItem, {isLoading: flagItemLoading, isError}] = useFlagItemMutation();
   const [deleteItem, {isLoading: deleteLoading, isError: deleteError}] = useDeleteItemMutation();
 
- 
+ // router-dom
+ const navigate = useNavigate();
   
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
@@ -167,6 +171,14 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
       toast.error(error);
     }
   }
+
+
+  const handleLogout = () => {
+    localStorage.removeItem('userInfo');
+    navigate('/login');
+    window.location.reload();
+  }
+
   const truncateText = (text, maxWords) => {
     if (typeof text !== 'string') return '';
     const words = text.split(' ');
@@ -215,7 +227,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                   Word Count
                 </Typography>
               </div>
-              <div className='flex space-x-2'>
+              <div className='flex space-x-2 items-center'>
               {isAdmin && (
                 <>
                   <Button
@@ -242,8 +254,19 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                   >
                     Dashboard
                   </Button>
+                 
                 </>
               )}
+               {user ? (
+                <LogoutIcon onClick={handleLogout} className='hover cursor-pointer'/>
+              ): (<>
+                <Button
+                variant='contained'
+                onClick={() => navigate('/login')}
+                >
+                  Login
+                </Button>
+              </>)}
             </div>
             </Toolbar>
           </CustomAppBar>
@@ -307,8 +330,15 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                       <ListItemText 
                         primary={
                           <div className='flex flex-col' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <div className='flex justify-between'>
-                              <span className='text-sm font-semibold'>{truncateText(text.para, 6)}</span>
+                            <div className='flex justify-between items-center'>
+                              <div className='flex space-x-1'>
+                                {text.isFlagged && <Tooltip title="Item is flagged" arrow><WarningIcon className='text-sm self-center' sx={{ color: 'white',
+                                  fontSize: '14px',
+                                  
+                                 }} />
+                                 </Tooltip>}
+                                <span className='text-sm font-semibold'>{truncateText(text.para, 6)}</span>
+                              </div>
                             {
                               user && ( 
                                 user.role === 'admin' && (
