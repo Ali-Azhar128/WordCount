@@ -275,14 +275,10 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                             <div className='flex justify-between'>
                               <span>{truncateText(text.para, 10)}</span>
                             {
-                              user && (
-                                
-                                  
-                                    user.role === 'admin' && (
-                                      <FlagIcon onClick={flagItem} sx={{ color: text.isFlagged ? 'white' : 'red' }} />
-                                    )
-                                   
-                                
+                              user && ( 
+                                user.role === 'admin' && (
+                                  <FlagIcon onClick={flagItem} sx={{ color: text.isFlagged ? 'white' : 'red' }} />
+                                )
                               )
                             }
 
