@@ -17,11 +17,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
 import { Button, Chip, Pagination, Stack, TextField } from '@mui/material';
-import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation } from '../Slices/paragraphsApiSlice';
+import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation, useDeleteItemMutation } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
 import FlagIcon from '@mui/icons-material/Flag';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { toast } from 'react-toastify';
 
 
@@ -116,6 +117,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
     page: pageNumber
   });
   const [flagItem, {isLoading: flagItemLoading, isError}] = useFlagItemMutation();
+  const [deleteItem, {isLoading: deleteLoading, isError: deleteError}] = useDeleteItemMutation();
 
  
   
@@ -144,6 +146,16 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
     }
   }
 
+  const handleDelete = async (e, id) => {
+    e.stopPropagation()
+    try {
+      const res = await deleteItem(id).unwrap();
+      toast.success(res)
+      refetchPage()
+    } catch (error) {
+      toast.error(error);
+    }
+  }
   const truncateText = (text, maxWords) => {
     if (typeof text !== 'string') return '';
     const words = text.split(' ');
@@ -284,11 +296,15 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                         primary={
                           <div className='flex flex-col' style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <div className='flex justify-between'>
-                              <span>{truncateText(text.para, 10)}</span>
+                              <span className='text-sm font-semibold'>{truncateText(text.para, 6)}</span>
                             {
                               user && ( 
                                 user.role === 'admin' && (
-                                  <FlagIcon onClick={(e) => toggleFlagItem(e, text.id)} sx={{ color: text.isFlagged ? 'white' : 'black' }} />
+                                  <div className='flex'>
+                                    <FlagIcon onClick={(e) => toggleFlagItem(e, text.id)} sx={{ color: text.isFlagged ? 'white' : 'black' }} />
+                                    <DeleteIcon onClick={(e) => handleDelete(e, text.id)} sx={{ color: 'black' }} />
+
+                                  </div>
                                 )
                               )
                             }

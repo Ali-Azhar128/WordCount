@@ -33,8 +33,17 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
           }),
           invalidatesTags: ["Paragraph"],
       }),
+
+      deleteItem: builder.mutation({
+        query: (id) => ({
+            url: `/deleteItem`,
+            method: "DELETE",
+            body: {id},
+        }),
+        invalidatesTags: ["Paragraph"],
+    }),
       }),
       overrideExisting: false,
     });
 
-export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation, useFlagItemMutation } = paragraphsApiSlice;
+export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation, useFlagItemMutation, useDeleteItemMutation } = paragraphsApiSlice;
