@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Post, Put, Query, Req, Res, UseGuards } from "@nestjs/common";
 import { ParaService } from "./para.service.js";
 import { CreateParaDto } from "./create-para.dto.js";
 import { Request, Response } from "express";
@@ -84,6 +84,33 @@ export class ParaController{
         message: 'Internal server error',
         error: error.message,
       });
+    }
+  }
+
+  @Put('flagItem')
+  async flagItem(
+    @Body() body: {id: string},
+    @Res() res: Response
+  ): Promise<any>{
+    try {
+      const result = await this.paraService.flagItem(body.id)
+      res.status(200).json(result)
+    } catch (error) {
+      return res.status(400).json(error.message)
+    }
+
+  }
+
+  @Delete('deleteItem')
+  async deleteItem(
+    @Body() body: {id: string},
+    @Res() res: Response
+  ): Promise<any>{
+    try {
+      const result = await this.paraService.deleteItem(body.id)
+      res.status(200).json(result)
+    } catch (error) {
+      res.status(400).json(error)
     }
   }
 

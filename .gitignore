@@ -1,3 +1,4 @@
+
 # Ignore the PDFs folder in the frontend/public directory
 frontend/public/PDFs/
 

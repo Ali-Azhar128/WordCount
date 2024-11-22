@@ -8,7 +8,6 @@ export const paragraphSlice = createSlice({
   },
   reducers: {
     setAllParas: (state, action) => {
-      // Clear the existing array first
       state.paragraphs = [];
       
       // Extract para property from each object and add to state
@@ -20,6 +19,8 @@ export const paragraphSlice = createSlice({
           count: item.count,
           pdfLink: item.pdfLink,
           language: item.language,
+          id: item._id,
+          isFlagged: item.isFlagged,
         }
         console.log(newItem, 'newItem')
         state.paragraphs.push(newItem);

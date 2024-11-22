@@ -17,10 +17,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
 import { Button, Chip, Pagination, Stack, TextField } from '@mui/material';
-import { useGetPageQuery, useSearchParaWithPageNumberQuery } from '../Slices/paragraphsApiSlice';
+import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation, useDeleteItemMutation } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
+import FlagIcon from '@mui/icons-material/Flag';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { toast } from 'react-toastify';
 
 
 const drawerWidth = 240;
@@ -102,15 +105,19 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const [page, setPage] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // redux
   const dispatch = useDispatch();
   const para = useSelector(state => state.paragraphs.paragraphs);
   const user = useSelector(state => state.login.userInfo)
   const pageNumber = useSelector(state => state.paragraphs.pageNumber);
-  const { data, error, isLoading } = useGetPageQuery(pageNumber);
+
+  const { data, error, isLoading, refetch: refetchPage } = useGetPageQuery(pageNumber);
   const { data: searchResultsWithPage, isLoading: isLoadingWithPage, refetch } = useSearchParaWithPageNumberQuery({
     keyword: search,
     page: pageNumber
   });
+  const [flagItem, {isLoading: flagItemLoading, isError}] = useFlagItemMutation();
+  const [deleteItem, {isLoading: deleteLoading, isError: deleteError}] = useDeleteItemMutation();
 
  
   
@@ -128,6 +135,27 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
     }
   };
 
+  const toggleFlagItem = async (e, id) => {
+    e.stopPropagation()
+    try {
+      const res = await flagItem(id).unwrap();
+      toast.success(res)
+      refetchPage()
+    } catch (error) {
+      toast.error(error);
+    }
+  }
+
+  const handleDelete = async (e, id) => {
+    e.stopPropagation()
+    try {
+      const res = await deleteItem(id).unwrap();
+      toast.success(res)
+      refetchPage()
+    } catch (error) {
+      toast.error(error);
+    }
+  }
   const truncateText = (text, maxWords) => {
     if (typeof text !== 'string') return '';
     const words = text.split(' ');
@@ -255,8 +283,9 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
             <ListContainer>
               <List>
                 {para.map((text, index) => (
-                  <ListItem key={index} disablePadding>
-                    <ListItemButton onClick={() => {
+                  <ListItem className={`${text.isFlagged && 'bg-red-600'} ${text.isFlagged && 'text-white'} border-b-2 border border-white`} key={index} disablePadding>
+                    <ListItemButton
+                     onClick={() => {
                       setText(text.para)
                       setCount(text.count)
                       setUrl(text.pdfLink)
@@ -266,16 +295,30 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                       <ListItemText 
                         primary={
                           <div className='flex flex-col' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span>{truncateText(text.para, 10)}</span>
+                            <div className='flex justify-between'>
+                              <span className='text-sm font-semibold'>{truncateText(text.para, 6)}</span>
+                            {
+                              user && ( 
+                                user.role === 'admin' && (
+                                  <div className='flex'>
+                                    <FlagIcon onClick={(e) => toggleFlagItem(e, text.id)} sx={{ color: text.isFlagged ? 'white' : 'black' }} />
+                                    <DeleteIcon onClick={(e) => handleDelete(e, text.id)} sx={{ color: 'black' }} />
+
+                                  </div>
+                                )
+                              )
+                            }
+                            </div>
                             <div className='flex space-x-1 justify-end'>
                               <Chip
-                               icon={<LanguageIcon />}
-                              sx={{ marginTop: '5px', alignSelf: 'flex-end', variant: 'outlined' }}
-                              label={text.language ? text.language :'No lang'} 
-                              size="small"
+
+                                icon={<LanguageIcon/>}
+                                sx={{ marginTop: '5px', alignSelf: 'flex-end', variant: 'outlined', backgroundColor: 'yellow' }}
+                                label={text.language ? text.language : 'No lang'} 
+                                size="small"
                               />
                               <Chip 
-                                sx={{ marginTop: '5px', alignSelf: 'flex-end' }}
+                                sx={{ marginTop: '5px', alignSelf: 'flex-end', backgroundColor: '#E0E0E0' }}
                                 label={formatDate(text.createdAt)} 
                                 size="small" 
                               />

@@ -119,7 +119,7 @@ const Form = () => {
             <form onSubmit={handleSubmit} className="form mt-20" >
                 <div className="textInput flex flex-col">
                     <label className="text-2xl font-bold mb-4" htmlFor="para">Enter Your Paragraph</label>
-                    <textarea className="text-white p-4" value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={50} id='para'/>
+                    <textarea className="p-1 bg-white border-2 rounded-md" value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={50} id='para'/>
                 </div>
                 <MuiButton loading={isLoading} text={'submit'} refetch={refetch}/>
             </form>
