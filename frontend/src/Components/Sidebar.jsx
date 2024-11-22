@@ -17,7 +17,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
 import { Button, Chip, Pagination, Stack, TextField } from '@mui/material';
-import { useGetPageQuery, useSearchParaWithPageNumberQuery } from '../Slices/paragraphsApiSlice';
+import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -128,6 +128,10 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
       dispatch(setAllParas([]));
     }
   };
+
+  const flagItem = () => {
+
+  }
 
   const truncateText = (text, maxWords) => {
     if (typeof text !== 'string') return '';
@@ -271,11 +275,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                               <span>{truncateText(text.para, 10)}</span>
                              {
                               user.role === 'admin' && (
-                                <FlagIcon onClick={(e) => {
-                                  e.stopPropagation();
-                                  console.log(text.id, 'id')
-  
-                                }} sx={{ color: 'red' }} />
+                                <FlagIcon onClick={flagItem} sx={{ color: 'red' }} />
                               )
                              }
 
