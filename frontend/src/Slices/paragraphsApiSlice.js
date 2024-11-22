@@ -28,4 +28,4 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
       overrideExisting: false,
     });
 
-    export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation } = paragraphsApiSlice;
+export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation } = paragraphsApiSlice;

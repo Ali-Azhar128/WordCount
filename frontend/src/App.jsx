@@ -1,13 +1,14 @@
 import { ToastContainer } from 'react-toastify'
 import './App.css'
 import MainPage from './Pages/mainPage'
+import { Outlet } from 'react-router-dom'
 
 function App() {
 
   return (
-    <div className='h-[95vh]'>
+    <div className='h-[100vh]'>
       <ToastContainer/>
-      <MainPage/>
+      <Outlet/>
     </div>
   )
 }

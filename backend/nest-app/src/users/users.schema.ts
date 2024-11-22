@@ -10,6 +10,15 @@ export class User{
 
     @Prop({ required: true })
     password: string
+
+    @Prop()
+    createdAt: string
+
+    @Prop()
+    role: string
+
+    @Prop({required: true})
+    email: string
 }
 
 export const UserSchema = SchemaFactory.createForClass(User)

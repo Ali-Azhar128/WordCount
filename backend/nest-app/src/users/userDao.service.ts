@@ -6,12 +6,11 @@ import { Model } from "mongoose";
 @Injectable()
 export class UserDao{
     constructor(@InjectModel(User.name) private readonly userModel: Model<UserDocument>){}
-    async findOne(username: string, pass: string): Promise<User>{
-        const user = await this.userModel.findOne({username: username}).exec()
+    async findOne(pass: string, email: string): Promise<User>{
+        const user = await this.userModel.findOne({email}).exec()
         if(user && user.password === pass){
             return user
         }else{
-            console.log('heree')
             throw new UnauthorizedException()
         }
     }

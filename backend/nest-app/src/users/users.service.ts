@@ -8,8 +8,8 @@ export class UsersService {
     private readonly userDao: UserDao
 ){}
     async findOne(userDto: userDto): Promise<any> {
-        const { username, pass } = userDto
-       return this.userDao.findOne(username, pass)
+        const { pass, email } = userDto
+       return this.userDao.findOne(pass, email)
     }
 
     async findAll(): Promise<any> {

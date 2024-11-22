@@ -16,7 +16,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
-import { Chip, Pagination, Stack, TextField } from '@mui/material';
+import { Button, Chip, Pagination, Stack, TextField } from '@mui/material';
 import { useGetPageQuery, useSearchParaWithPageNumberQuery } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
@@ -100,9 +100,11 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const dispatch = useDispatch();
   const para = useSelector(state => state.paragraphs.paragraphs);
+  const user = useSelector(state => state.login.userInfo)
   const pageNumber = useSelector(state => state.paragraphs.pageNumber);
   const { data, error, isLoading } = useGetPageQuery(pageNumber);
   const { data: searchResultsWithPage, isLoading: isLoadingWithPage, refetch } = useSearchParaWithPageNumberQuery({
@@ -110,6 +112,8 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
     page: pageNumber
   });
 
+ 
+  
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
 
@@ -144,25 +148,63 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
     }
   }, [data, dispatch]);
 
+  useEffect(() => {
+    setIsAdmin(user?.role === 'admin');
+  }
+, [user]);
+
+
   return (
     isLoading && isLoadingWithPage ? <div>Loading...</div> : (
       <div className="relative">
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
-          <CustomAppBar position="fixed" open={open}>
-            <Toolbar>
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={handleDrawerOpen}
-                edge="start"
-                sx={{ mr: 2, ...(open && { display: 'none' }) }}
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" noWrap component="div">
-                Word Count
-              </Typography>
+          <CustomAppBar className='flex' position="fixed" open={open}>
+            <Toolbar className='w-full flex justify-between items-center'>
+              <div className='flex items-center'>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={handleDrawerOpen}
+                  edge="start"
+                  sx={{ mr: 2, ...(open && { display: 'none' }) }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" noWrap component="div">
+                  Word Count
+                </Typography>
+              </div>
+              <div className='flex space-x-2'>
+              {isAdmin && (
+                <>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: theme.palette.primary.main,
+                      color: theme.palette.primary.contrastText,
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                      },
+                    }}
+                  >
+                    Analytics
+                  </Button>
+                  <Button
+                    variant="contained"
+                    sx={{
+                      backgroundColor: theme.palette.primary.main,
+                      color: theme.palette.primary.contrastText,
+                      '&:hover': {
+                        backgroundColor: theme.palette.primary.dark,
+                      },
+                    }}
+                  >
+                    Dashboard
+                  </Button>
+                </>
+              )}
+            </div>
             </Toolbar>
           </CustomAppBar>
           <Drawer

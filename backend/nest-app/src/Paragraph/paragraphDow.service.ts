@@ -23,7 +23,5 @@ export class ParaDOW {
             .exec();
     }
 
-    async findByIp(ip: string): Promise<ParaDocument[]> {
-        return await this.paraModel.find({ ip }).exec();
-    }
+   
 }
