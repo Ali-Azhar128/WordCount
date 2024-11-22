@@ -214,6 +214,7 @@ export class ParaService {
     }
 
     async deleteItem(id: string): Promise<any>{
-        const doc = await this.paraDow.delete(id)
+        const res = await this.paraDow.delete(id)
+        return res
     }
 }
