@@ -260,8 +260,9 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
             <ListContainer>
               <List>
                 {para.map((text, index) => (
-                  <ListItem key={index} disablePadding>
-                    <ListItemButton onClick={() => {
+                  <ListItem className={`${text.isFlagged && 'bg-red-600'} ${text.isFlagged && 'text-white'} border-b-2 border border-white`} key={index} disablePadding>
+                    <ListItemButton
+                     onClick={() => {
                       setText(text.para)
                       setCount(text.count)
                       setUrl(text.pdfLink)
@@ -273,19 +274,25 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                           <div className='flex flex-col' style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <div className='flex justify-between'>
                               <span>{truncateText(text.para, 10)}</span>
-                             {
-                              user.role === 'admin' && (
-                                <FlagIcon onClick={flagItem} sx={{ color: 'red' }} />
+                            {
+                              user && (
+                                
+                                  
+                                    user.role === 'admin' && (
+                                      <FlagIcon onClick={flagItem} sx={{ color: text.isFlagged ? 'white' : 'red' }} />
+                                    )
+                                   
+                                
                               )
-                             }
+                            }
 
                             </div>
                             <div className='flex space-x-1 justify-end'>
                               <Chip
-                               icon={<LanguageIcon />}
-                              sx={{ marginTop: '5px', alignSelf: 'flex-end', variant: 'outlined' }}
-                              label={text.language ? text.language :'No lang'} 
-                              size="small"
+                                icon={<LanguageIcon/>}
+                                sx={{ marginTop: '5px', alignSelf: 'flex-end', variant: 'outlined'}}
+                                label={text.language ? text.language : 'No lang'} 
+                                size="small"
                               />
                               <Chip 
                                 sx={{ marginTop: '5px', alignSelf: 'flex-end' }}
