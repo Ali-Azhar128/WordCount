@@ -12,17 +12,20 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
         getPage: builder.query({
             query: (page) => `/getPage?page=${page}`,
         }),
+        providesTags: ["Paragraph"],
 
         searchParaWithPageNumber: builder.query({
           query: ({keyword, page}) => `/searchPage?keyword=${keyword}&page=${page}&perPage=5`,
       }),
-
+      providesTags: ["Paragraph"],
+      
         addParagraph: builder.mutation({
         query: (newParagraph) => ({
             url: "/getCount",
             method: "POST",
             body: newParagraph,
         }),
+        providesTags: ["Paragraph"],
         }),
 
         flagItem: builder.mutation({

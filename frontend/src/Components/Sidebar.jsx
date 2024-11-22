@@ -104,6 +104,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [refetchData, setRefetchData] = useState(false);
 
   // redux
   const dispatch = useDispatch();
@@ -138,6 +139,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const toggleFlagItem = async (e, id) => {
     e.stopPropagation()
     try {
+     
       const res = await flagItem(id).unwrap();
       toast.success(res)
       refetchPage()
@@ -149,9 +151,18 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const handleDelete = async (e, id) => {
     e.stopPropagation()
     try {
+      console.log(data, 'data before delete')
       const res = await deleteItem(id).unwrap();
+      console.log(data, 'data after delete')
       toast.success(res)
+      const updatedData = await refetch().unwrap();
+
+       if (updatedData.docs.length === 0 && pageNumber > 1) {
+        dispatch(setPageNumber(pageNumber - 1));
+      }
+      setRefetchData(!refetchData)
       refetchPage()
+      refetch()
     } catch (error) {
       toast.error(error);
     }
@@ -173,8 +184,9 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   useEffect(() => {
     if (data) {
       dispatch(setAllParas(data));
+      console.log('data refetched')
     }
-  }, [data, dispatch]);
+  }, [data, dispatch, refetchData]);
 
   useEffect(() => {
     setIsAdmin(user?.role === 'admin');
