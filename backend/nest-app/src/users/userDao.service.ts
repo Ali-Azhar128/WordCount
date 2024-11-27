@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "./users.schema.js";
 import { Model } from "mongoose";
+import { userSignupDto } from "./userSignup.dto.js";
 
 @Injectable()
 export class UserDao{
@@ -17,5 +18,14 @@ export class UserDao{
 
     async findAll(): Promise<any>{
         return await this.userModel.find().exec()
+    }
+
+    async create(userSignupDto: userSignupDto): Promise<User>{
+        const { email } = userSignupDto
+        const user = await this.userModel.findOne({email}).exec()
+        if(user){
+            throw new Error('User already exists')
+        }
+        return await this.userModel.create(userSignupDto)
     }
 }

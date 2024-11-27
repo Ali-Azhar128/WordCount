@@ -10,4 +10,8 @@ export class CreateParaDto{
     @IsNotEmpty()
     ip: string
 
+    @IsNotEmpty()
+    @IsString()
+    user: string
+
 }

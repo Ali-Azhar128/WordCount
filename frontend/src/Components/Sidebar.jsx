@@ -16,10 +16,10 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
-import { Button, Chip, Pagination, Stack, TextField, Tooltip } from '@mui/material';
+import { Avatar, Button, Chip, Pagination, Stack, TextField, Tooltip } from '@mui/material';
 import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation, useDeleteItemMutation } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAllParas, setPageNumber } from '../Slices/paragraphsSlice';
+import { setAllParas, setFlaggedItem, setPageNumber, setParagraphId, setUserIdToSendNotificationTo } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
 import FlagIcon from '@mui/icons-material/Flag';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -27,6 +27,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
 
 
 const drawerWidth = 240;
@@ -102,7 +103,9 @@ const PaginationContainer = styled('div')(({ theme }) => ({
   }
 }));
 
-export default function PersistentDrawerLeft({ paragraphs, setText, setCount, setUrl, toggle, search, setSearch, setData }) {
+export default function PersistentDrawerLeft({ paragraphs, setText, setCount, setUrl, toggle, search, setSearch, setData, setFlagged }) {
+
+const socket = io('http://localhost:3000')
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [page, setPage] = useState(1);
@@ -129,6 +132,15 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
 
+  const getInitials = () => {
+    const nameParts = user.username.split('_');
+    if (nameParts.length > 1) {
+      return `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase();
+    }
+    return user.username[0].toUpperCase();
+  };
+
+
   const getDocs = async () => {
     try {
       const data = await fetch('http://localhost:3000/getAll');
@@ -140,14 +152,26 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
     }
   };
 
-  const toggleFlagItem = async (e, id) => {
+  const toggleFlagItem = async (e, id, createdBy, flagged) => {
     e.stopPropagation()
     try {
-     
+      console.log(createdBy, 'createdBy')
+      dispatch(setUserIdToSendNotificationTo({createdBy, id}))
       const res = await flagItem(id).unwrap();
+      dispatch(setParagraphId(id))
+      // if(!flagged) {
+      //   socket.emit('sendNotification', {
+      //     userId: createdBy, 
+      //     message: 'Your paragraph is flagged by an admin'
+      //   });
+      // }
+      
+      console.log(flagged, 'text.isFlagged')
       toast.success(res)
       refetchPage()
+      console.log('here')
     } catch (error) {
+      console.error(error)
       toast.error(error);
     }
   }
@@ -168,6 +192,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
       refetchPage()
       refetch()
     } catch (error) {
+      console.error(error)
       toast.error(error);
     }
   }
@@ -258,7 +283,21 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                 </>
               )}
                {user ? (
+                <>
+                {user.role === 'admin' ? (<Avatar sx={{ m: 1, bgcolor: 'green',
+                    borderRadius: '50%',
+                   }}>
+                  A
+                  </Avatar>) : (
+                  <Avatar sx={{ m: 1, bgcolor: 'green',
+                    borderRadius: '50%',
+                   }}>
+                  {getInitials()}
+                  </Avatar>
+                )}
                 <LogoutIcon onClick={handleLogout} className='hover cursor-pointer'/>
+                
+                </>
               ): (<>
                 <Button
                 variant='contained'
@@ -343,7 +382,7 @@ export default function PersistentDrawerLeft({ paragraphs, setText, setCount, se
                               user && ( 
                                 user.role === 'admin' && (
                                   <div className='flex'>
-                                    <FlagIcon onClick={(e) => toggleFlagItem(e, text.id)} sx={{ color: text.isFlagged ? 'white' : 'black' }} />
+                                    <FlagIcon onClick={(e) => toggleFlagItem(e, text.id, text.createdBy, text.isFlagged)} sx={{ color: text.isFlagged ? 'white' : 'black' }} />
                                     <DeleteIcon onClick={(e) => handleDelete(e, text.id)} sx={{ color: 'black' }} />
 
                                   </div>

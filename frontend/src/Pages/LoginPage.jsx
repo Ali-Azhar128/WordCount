@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
-import LoginForm from '../Components/LoginComponent/LoginForm'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import LoginForm from '../Components/LoginComponent/LoginForm'
 
 const LoginPage = () => {
   const navigate = useNavigate()
@@ -14,6 +14,7 @@ const LoginPage = () => {
   return (
     <div>
       <LoginForm/>
+      
     </div>
   )
 }

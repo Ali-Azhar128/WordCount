@@ -5,6 +5,9 @@ export const paragraphSlice = createSlice({
   initialState: {
     paragraphs: [],
     pageNumber: 1,
+    userId: '',
+    flaggedItem: false,
+    paragraphId: ''
   },
   reducers: {
     setAllParas: (state, action) => {
@@ -21,6 +24,7 @@ export const paragraphSlice = createSlice({
           language: item.language,
           id: item._id,
           isFlagged: item.isFlagged,
+          createdBy: item.createdBy,
         }
         console.log(newItem, 'newItem')
         state.paragraphs.push(newItem);
@@ -31,11 +35,26 @@ export const paragraphSlice = createSlice({
 
     setPageNumber: (state, action) => {
       state.pageNumber = action.payload;
+    },
+
+    setUserIdToSendNotificationTo: (state, action) => {
+      state.userId = action.payload.createdBy
+      state.paragraphId = action.payload.id
+      console.log(action.payload, 'payload of user id')
+    },
+
+    setFlaggedItem: (state, action) => {
+      state.flaggedItem = action.payload
+    },
+
+    setParagraphId: (state, action) => {
+      console.log(action.payload, 'payload')
+      state.paragraphId = action.payload
     }
-  },
+  }
 })
 
 // Action creators are generated for each case reducer function
-export const { setAllParas, setPageNumber } = paragraphSlice.actions
+export const { setAllParas, setPageNumber, setUserIdToSendNotificationTo, setFlaggedItem,setParagraphId } = paragraphSlice.actions
 
 export default paragraphSlice.reducer

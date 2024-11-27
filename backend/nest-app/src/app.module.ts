@@ -26,8 +26,12 @@ const __dirname = dirname(__filename);
       rootPath: join(__dirname, '..', '..', '..', 'frontend', 'public'),
       serveRoot: '/public/',
     }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', '..', 'frontend/dist'),
+      serveRoot: '/' // Path to the frontend build folder
+    }),
     ConfigModule.forRoot(),
-    // Todo: Added JWT authentication alongwith guards
+    // Todo: Add JWT authentication alongwith guards
     // PassportModule,
     // JwtModule.registerAsync({
     //   imports: [ConfigModule],

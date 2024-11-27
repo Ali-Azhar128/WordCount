@@ -5,8 +5,12 @@ import SearchField from "./SearchField"
 import PersistentDrawerLeft from "./Sidebar"
 import { useDispatch, useSelector } from "react-redux"
 import { setAllParas } from "../Slices/paragraphsSlice"
-import { useGetAllParagraphsQuery, useAddParagraphMutation, useSearchParaWithPageNumberQuery } from "../Slices/paragraphsApiSlice"
+import { useGetAllParagraphsQuery, useAddParagraphMutation, useSearchParaWithPageNumberQuery, useFindByIDQuery } from "../Slices/paragraphsApiSlice"
+import io from 'socket.io-client'
+import CustomNotification from "./Notification"
 
+
+const socket = io('http://localhost:3000')
 
 const Form = () => {
     //states
@@ -19,17 +23,27 @@ const Form = () => {
     const [paragraphs, setParagraphs] = useState([])
     const [sortOrder, setSortOrder] = useState('asc')
     const [search, setSearch] = useState('');
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState('');
+    const [flagged, setFlagged] = useState(false)
+    const [paraId, setParaId] = useState('')
 
     //redux
     const dispatch = useDispatch()
     const paragraphsFromRedux = useSelector(state => state.paragraphs.paragraphs)
+    const user = useSelector(state => state.login.userInfo)
     // const { data: docs, loading: loadingDocs, refetch } = useGetAllParagraphsQuery()
     const pageNumber = useSelector(state => state.paragraphs.pageNumber)
+    const flaggedItem = useSelector(state => state.paragraphs.flaggedItem)
+    const userId = useSelector(state => state.paragraphs.userId)
+    const paragraphId = useSelector(state => state.paragraphs.paragraphId)
     const { data: docs, isLoading: loadingDocs, isError: isErrorWithPage, refetch } = useSearchParaWithPageNumberQuery({
       keyword: search ? search : '', 
       page: pageNumber
   })
     const [addParagraph, { isLoading, isError, data: addParagraphData }] = useAddParagraphMutation()
+    const {data: paraData} = useFindByIDQuery(paraId)
+
     //functions
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -39,7 +53,7 @@ const Form = () => {
     const addData = async (text) => {
       try {
 
-        const result = await addParagraph({ paragraph: text, ip }).unwrap()
+        const result = await addParagraph({ paragraph: text, ip, user: user.sub }).unwrap()
         setCount(result.count)
         setUrl(`http://localhost:3000${result.pdfDownloadLink}`)
         setData(result.pdfDownloadLink)
@@ -68,6 +82,47 @@ const Form = () => {
         
       }
     }, [docs])
+
+
+    useEffect(() => {
+      console.log(paraData, 'paraData')
+    }, [paraData, paraId])
+    useEffect(() => {
+      if (user) {
+        let finalId = userId === '' ? user.sub : userId
+        console.log(finalId, 'finalId')
+        socket.emit('join', finalId); // Join the user's room
+        console.log('User connected to socket:', finalId);
+      }
+      
+      
+      socket.on('notification', (data) => {
+        
+        console.log('Received notification:', data)
+        setParaId(data.id)
+        setMessage(data.message)
+        setOpen(true);
+      });
+
+      socket.on('connect', () => {
+        console.log('Socket connected');
+      });
+
+      socket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
+      });
+    
+  
+      return () => {
+        socket.off('notification');
+        socket.off('connect');
+        socket.off('connect_error');
+      };
+    }, [user, userId]);
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
 
     const toggleSortOrder = () => {
       setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'))
@@ -114,7 +169,7 @@ const Form = () => {
    
     return (
         <div className="h-[100%] flex flex-col items-center justify-center">
-          <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} setCount={setCount} setUrl={setUrl} toggle={toggleSortOrder} search={search} setSearch={setSearch} setData={setData}/>
+          <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} setCount={setCount} setUrl={setUrl} toggle={toggleSortOrder} search={search} setSearch={setSearch} setData={setData} setFlagged={setFlagged}/>
           {/* <SearchField setParagraph={setParagraphs}/> */}
             <form onSubmit={handleSubmit} className="form mt-20" >
                 <div className="textInput flex flex-col">
@@ -130,6 +185,7 @@ const Form = () => {
             <>
                 <MuiButton text={'Download PDF'} url={url} onClick={onClick} />
             </>}
+            {user.role !== 'admin' && <CustomNotification open={open} handleClose={handleClose} message={message} paraId={paraId} setText={setText} setCount={setCount} setUrl={setUrl} setData={setData}/>}
         </div>
     )
 }

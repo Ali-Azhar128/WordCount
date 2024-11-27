@@ -6,6 +6,7 @@ import { Response } from "express";
 import { JwtAuthGuard } from "./jwt/jwt-auth.guard.js";
 import { userDto } from "../users/user.dto.js";
 import { RequestWithUser } from "./jwt/request-with-user.interface.js";
+import { userSignupDto } from "../users/userSignup.dto.js";
 
 
 @Controller('auth')
@@ -34,6 +35,21 @@ export class AuthController{
                });
         } catch (error) {
             return res.status(400).json({message: error.message})
+        }
+    }
+
+    @Post('/register')
+    async signUp(
+        @Body() userSignupDto: userSignupDto,
+        @Req() req: Request,
+        @Res() res: Response
+    ){
+        try {
+            const payload = await this.authService.signUp(userSignupDto)
+            console.log(payload, 'user payload')
+            return res.json(payload)
+        } catch (error) {
+            return res.status(400).json(error.message)
         }
     }
 

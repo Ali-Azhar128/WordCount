@@ -12,6 +12,7 @@ import {
 } from "react-router-dom";
 import MainPage from './Pages/MainPage.jsx'
 import LoginPage from './Pages/LoginPage.jsx'
+import UserLoginForm from './Components/LoginComponent/UserLoginForm.jsx'
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
     path: '/main',
     element: <MainPage />,
   },
+  {
+    path: '/register',
+    element: <UserLoginForm/>
+  }
 ])
 
 createRoot(document.getElementById('root')).render(

@@ -114,6 +114,19 @@ export class ParaController{
     }
   }
 
+  @Get('findById')
+  async findById(
+    @Query('id') id: string,
+    @Res() res: Response
+  ): Promise<any>{
+    try {
+      const result = await this.paraService.findById(id)
+      res.status(200).json(result)
+    } catch (error) {
+      res.status(400).json(error)
+    }
+  }
+
     
 
 }

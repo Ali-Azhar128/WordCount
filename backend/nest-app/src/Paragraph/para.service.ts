@@ -10,6 +10,7 @@ import contractions from 'contractions';
 import { ParaDOW } from "./paragraphDow.service.js";
 import { franc } from "franc";
 import {iso6392} from 'iso-639-2'
+import { NotificationGateway } from "./notification.gateway.js";
 
 interface Token {
     value: string,
@@ -22,7 +23,11 @@ export class ParaService {
     private segmenter: any
     private specialCharacters: string[]
 
-    constructor(@InjectModel(Paragraph.name) private paraModel: Model<ParaDocument>, private readonly paraDow: ParaDOW) {
+    constructor
+    (@InjectModel(Paragraph.name) private paraModel: Model<ParaDocument>,
+     private readonly paraDow: ParaDOW,
+     private readonly notificationGateway: NotificationGateway
+    ) {
 
         this.tokenizer = new winkTokenizer()
         this.segmenter = new TinySegmenter()
@@ -115,7 +120,7 @@ export class ParaService {
     }
 
     async getCount(createParaDto: CreateParaDto): Promise<{ count: number, id: string }> {
-        const { paragraph, ip } = createParaDto;
+        const { paragraph, ip, user } = createParaDto;
         const preprocessedParagraph = contractions.expand(paragraph);
         let tokens: string[] = [];
 
@@ -153,7 +158,7 @@ export class ParaService {
         console.log(tokens);
         let count = tokens.length;
 
-        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false });
+        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false, createdBy: user });
         await savedPara.save();
         return { count, id: savedPara.id };
     }
@@ -210,11 +215,17 @@ export class ParaService {
         }
         doc.isFlagged = !doc.isFlagged;
         await doc.save();
+        console.log(doc.createdBy, 'Sending notification to:')
+        this.notificationGateway.sendNotification({userId: doc.createdBy, message: 'Your paragraph has been flagged.', id: doc._id as string});
         return 'Document flagged';
     }
 
     async deleteItem(id: string): Promise<any>{
         const res = await this.paraDow.delete(id)
         return res
+    }
+
+    async findById(id: string): Promise<ParaDocument> {
+        return this.paraModel.findById(id).exec();
     }
 }

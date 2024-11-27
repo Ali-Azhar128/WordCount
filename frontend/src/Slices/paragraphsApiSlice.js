@@ -44,9 +44,13 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
             body: {id},
         }),
         invalidatesTags: ["Paragraph"],
-    }),
+        }),
+
+        findByID: builder.query({
+          query: (id) => `/findById?id=${id}`,
+        }),
       }),
       overrideExisting: false,
     });
 
-export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation, useFlagItemMutation, useDeleteItemMutation } = paragraphsApiSlice;
+export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation, useFlagItemMutation, useDeleteItemMutation, useFindByIDQuery } = paragraphsApiSlice;

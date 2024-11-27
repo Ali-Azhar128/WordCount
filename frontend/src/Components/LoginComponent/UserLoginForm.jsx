@@ -2,27 +2,28 @@ import React, { useState } from 'react'
 import TextField from '@mui/material/TextField'
 import { Button, Container, Typography, Box, Paper, Avatar, Divider } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useLoginMutation } from '../../Slices/usersApiSlices'
+import { useUserLoginMutation } from '../../Slices/usersApiSlices'
 import { toast } from 'react-toastify'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setLoginInfo } from '../../Slices/usersSlice'
 import LoadingButton from '@mui/lab/LoadingButton';
 
-const LoginForm = () => {
+const UserLoginForm = () => {
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
+  const [username, setUsername] = useState('')
 
   // React Router DOM
   const navigate = useNavigate()
   // Redux
-  const [login, {isLoading, isError}] = useLoginMutation()
+  const [login, {isLoading, isError}] = useUserLoginMutation()
   const dispatch = useDispatch()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = { email, pass };
-    console.log(email + pass, 'All data');
+    const user = { email, pass, username, role: 'user' };
+    console.log(email + pass + username, 'All data');
     try {
       const res = await login(user).unwrap();
       console.log('Success login', res);
@@ -49,13 +50,24 @@ const LoginForm = () => {
           <Typography component="h1" variant="h5" sx={{
             fontWeight: 'bold',
           }}>
-            Sign In
+            Sign Up
           </Typography>
           <Typography component="h7" variant="h7">
-            Please sign in to continue
+            Create an account
           </Typography>
           
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="username"
+              label="Username"
+              type="text"
+              id="username"
+              autoComplete="current-username"
+              onChange={(e) => setUsername(e.target.value)}
+            />
             <TextField
               margin="normal"
               required
@@ -98,7 +110,7 @@ const LoginForm = () => {
             Sign In as Guest
           </Button>
           <Typography>
-            Don't have an account? <Link to="/register">Register</Link>
+            Already have an account? <Link to="/login">Login</Link>
           </Typography>
           </Box>
         </Box>
@@ -107,4 +119,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default UserLoginForm

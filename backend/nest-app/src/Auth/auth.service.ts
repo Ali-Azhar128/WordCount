@@ -3,6 +3,7 @@ import { userDto } from "../users/user.dto.js";
 import { UsersService } from "../users/users.service.js";
 import { JwtService } from "@nestjs/jwt";
 import { v4 as uuidv4 } from 'uuid'
+import { userSignupDto } from "src/users/userSignup.dto.js";
 
 @Injectable()
 export class AuthService{
@@ -15,7 +16,7 @@ export class AuthService{
         const user = await this.userService.findOne(userDto)
         console.log(user.role, 'user')
         const seed = uuidv4()
-        const payload = {sub: user.id, role: user.role, seed}
+        const payload = {sub: user.id, role: user.role, seed, username: user.username}
         return {
             access_token: await this.jwtService.signAsync(payload)
         }
@@ -25,7 +26,17 @@ export class AuthService{
         return this.jwtService.verifyAsync(token, {
           secret: 'abc123',
         });
-      }
+    }
+
+    async signUp(userSignupDto: userSignupDto){
+        const user = await this.userService.create(userSignupDto)
+        const seed = uuidv4()
+        const payload = {sub: user.id, role: 'user', seed}
+        return {
+            access_token: await this.jwtService.signAsync(payload),
+            username: user.username
+        }
+    }
 
     
 }

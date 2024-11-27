@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { UsersService } from './users.service.js';
 import { userDto } from './user.dto.js';
+import { userSignupDto } from './userSignup.dto.js';
 
 @Controller('users')
 export class UsersController {
@@ -29,6 +30,20 @@ export class UsersController {
         try {
             const users = await this.userService.findAll()
             return res.json(users)
+        } catch (error) {
+            return res.status(400).json(error)
+        }
+    }
+
+    @Post('/register')
+    async registerUser(
+        @Body() userSignupDto: userSignupDto, 
+        @Req() req: Request, 
+        @Res() res: Response
+    ): Promise<any>{
+        try {
+            const user = await this.userService.create(userSignupDto)
+            return res.json(user)
         } catch (error) {
             return res.status(400).json(error)
         }

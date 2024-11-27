@@ -6,13 +6,14 @@ import { Mongoose } from "mongoose";
 import { MongooseModule } from "@nestjs/mongoose";
 import { PdfService } from "./pdf.service.js";
 import { ParaDOW } from "./paragraphDow.service.js";
+import { NotificationGateway } from "./notification.gateway.js";
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: Paragraph.name, schema: ParaSchema }])
     ],
     controllers: [ParaController],
-    providers: [ParaService, PdfService, ParaDOW]
+    providers: [ParaService, PdfService, ParaDOW, NotificationGateway]
 })
 
 export class ParaModule{}

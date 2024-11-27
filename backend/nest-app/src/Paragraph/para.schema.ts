@@ -26,6 +26,9 @@ export class Paragraph{
   @Prop({ default: false, required: true })
   isFlagged: boolean;
 
+  @Prop()
+  createdBy: string
+
 }
 
 export const ParaSchema = SchemaFactory.createForClass(Paragraph)
