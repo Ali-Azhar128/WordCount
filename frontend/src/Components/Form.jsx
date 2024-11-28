@@ -10,12 +10,6 @@ import io from 'socket.io-client'
 import CustomNotification from "./Notification"
 
 
-const socket = io('http://localhost:3000',
-  {
-    reconnectionAttempts: 5,
-    reconnectionDelay: 5000,
-  }
-)
 
 const Form = () => {
     //states
@@ -92,13 +86,25 @@ const Form = () => {
     useEffect(() => {
       console.log(paraData, 'paraData')
     }, [paraData, paraId])
+
+    
     useEffect(() => {
-      if (user) {
-        let finalId = userId === '' ? user.sub : userId
-        console.log(finalId, 'finalId')
-        socket.emit('join', finalId); // Join the user's room
-        console.log('User connected to socket:', finalId);
-      }
+      const socket = io('http://localhost:3000')
+
+      const handleConnect = () => {
+        console.log('Socket connected');
+        if (user) {
+          let finalId = userId === '' ? user.sub : userId;
+          socket.emit('join', finalId);
+          console.log('User connected to socket:', finalId);
+        }
+      };
+      // if (user) {
+      //   let finalId = userId === '' ? user.sub : userId
+      //   console.log(finalId, 'finalId')
+      //   socket.emit('join', finalId); 
+      //   console.log('User connected to socket:', finalId);
+      // }
       
       
       socket.on('notification', (data) => {
@@ -109,9 +115,7 @@ const Form = () => {
         setOpen(true);
       });
 
-      socket.on('connect', () => {
-        console.log('Socket connected');
-      });
+      socket.on('connect', handleConnect);
 
       socket.on('connect_error', (error) => {
         console.error('Socket connection error:', error);

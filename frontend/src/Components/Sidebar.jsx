@@ -117,6 +117,7 @@ const socket = io('http://localhost:3000')
   const para = useSelector(state => state.paragraphs.paragraphs);
   const user = useSelector(state => state.login.userInfo)
   const pageNumber = useSelector(state => state.paragraphs.pageNumber);
+  const userId = useSelector(state => state.paragraphs.userId)
 
   const { data, error, isLoading, refetch: refetchPage } = useGetPageQuery(pageNumber);
   const { data: searchResultsWithPage, isLoading: isLoadingWithPage, refetch } = useSearchParaWithPageNumberQuery({
@@ -155,10 +156,11 @@ const socket = io('http://localhost:3000')
   const toggleFlagItem = async (e, id, createdBy, flagged) => {
     e.stopPropagation()
     try {
+      
       console.log(createdBy, 'createdBy')
       dispatch(setUserIdToSendNotificationTo({createdBy, id}))
       const res = await flagItem(id).unwrap();
-      dispatch(setParagraphId(id))
+      dispatch(setParagraphId(id));
       // if(!flagged) {
       //   socket.emit('sendNotification', {
       //     userId: createdBy, 
