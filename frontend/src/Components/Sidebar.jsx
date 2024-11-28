@@ -122,7 +122,8 @@ const socket = io('http://localhost:3000')
   const { data, error, isLoading, refetch: refetchPage } = useGetPageQuery(pageNumber);
   const { data: searchResultsWithPage, isLoading: isLoadingWithPage, refetch } = useSearchParaWithPageNumberQuery({
     keyword: search,
-    page: pageNumber
+    page: pageNumber,
+    userId: user.sub,
   });
   const [flagItem, {isLoading: flagItemLoading, isError}] = useFlagItemMutation();
   const [deleteItem, {isLoading: deleteLoading, isError: deleteError}] = useDeleteItemMutation();
@@ -219,6 +220,12 @@ const socket = io('http://localhost:3000')
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+ useEffect(() => {
+  if(searchResultsWithPage){
+    console.log(searchResultsWithPage.docs, 'total pages')
+  }
+ }, [searchResultsWithPage])
 
   useEffect(() => {
     if (data) {

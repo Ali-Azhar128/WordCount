@@ -39,7 +39,8 @@ const Form = () => {
     const { data: docs, isLoading: loadingDocs, isError: isErrorWithPage, refetch } = useSearchParaWithPageNumberQuery({
       keyword: search ? search : '', 
       page: pageNumber,
-      userId: user.sub
+      userId: user.sub,
+      role: user.role
   })
     const [addParagraph, { isLoading, isError, data: addParagraphData }] = useAddParagraphMutation()
     const {data: paraData} = useFindByIDQuery(paraId)
