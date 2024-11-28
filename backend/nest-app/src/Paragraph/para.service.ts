@@ -181,10 +181,10 @@ export class ParaService {
 
     }
 
-    async getDocsWithPagination(page: number = 1, perPage: number = 5): Promise<any> {
-        const totalDocs = await this.paraModel.countDocuments().exec();
+    async getDocsWithPagination(page: number = 1, perPage: number = 5, userId: string): Promise<any> {
+        const totalDocs = await this.paraModel.countDocuments({createdBy: userId}).exec();
         const docs = await this.paraModel
-          .find()
+          .find({createdBy: userId})
           .skip((page - 1) * perPage)
           .limit(perPage)
           .exec();

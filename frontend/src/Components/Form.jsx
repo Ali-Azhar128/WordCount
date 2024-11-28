@@ -38,7 +38,8 @@ const Form = () => {
     const paragraphId = useSelector(state => state.paragraphs.paragraphId)
     const { data: docs, isLoading: loadingDocs, isError: isErrorWithPage, refetch } = useSearchParaWithPageNumberQuery({
       keyword: search ? search : '', 
-      page: pageNumber
+      page: pageNumber,
+      userId: user.sub
   })
     const [addParagraph, { isLoading, isError, data: addParagraphData }] = useAddParagraphMutation()
     const {data: paraData} = useFindByIDQuery(paraId)
