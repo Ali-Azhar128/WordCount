@@ -124,6 +124,7 @@ const socket = io('http://localhost:3000')
     keyword: search,
     page: pageNumber,
     userId: user.sub,
+    role: user.role
   });
   const [flagItem, {isLoading: flagItemLoading, isError}] = useFlagItemMutation();
   const [deleteItem, {isLoading: deleteLoading, isError: deleteError}] = useDeleteItemMutation();
