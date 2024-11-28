@@ -35,8 +35,10 @@ const UserLoginForm = () => {
   };
 
   const handleGuestLogin = () => {
-    // Handle guest login logic here
-    navigate('/main'); // Navigate to the main page for guest login
+    // dispatch(setLoginInfo({ role: 'guest',
+    //   username: 'Guest',
+    //  })); 
+    navigate('/guestLogin'); 
   };
 
 

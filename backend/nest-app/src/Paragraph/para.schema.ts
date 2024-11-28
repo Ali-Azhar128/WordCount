@@ -28,7 +28,6 @@ export class Paragraph{
 
   @Prop()
   createdBy: string
-
 }
 
 export const ParaSchema = SchemaFactory.createForClass(Paragraph)

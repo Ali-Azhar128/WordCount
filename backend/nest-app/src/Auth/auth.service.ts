@@ -4,6 +4,8 @@ import { UsersService } from "../users/users.service.js";
 import { JwtService } from "@nestjs/jwt";
 import { v4 as uuidv4 } from 'uuid'
 import { userSignupDto } from "src/users/userSignup.dto.js";
+import { guestUserSignInDto } from "src/users/guestUserSignIn.dto.js";
+import { access } from "fs";
 
 @Injectable()
 export class AuthService{
@@ -37,6 +39,17 @@ export class AuthService{
             username: user.username
         }
     }
+
+    async guestLogin(username: guestUserSignInDto){
+        const user = await this.userService.createGuest(username)
+        const seed = uuidv4()
+        const payload = {sub: user.id, role: 'guest', seed, username: user.username}
+        return {
+            access_token: await this.jwtService.signAsync(payload),
+            username: user.username
+        }
+    }
+
 
     
 }

@@ -3,6 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "./users.schema.js";
 import { Model } from "mongoose";
 import { userSignupDto } from "./userSignup.dto.js";
+import { guestUserSignInDto } from "./guestUserSignIn.dto.js";
 
 @Injectable()
 export class UserDao{
@@ -28,4 +29,12 @@ export class UserDao{
         }
         return await this.userModel.create(userSignupDto)
     }
+
+    async createGuest(name: guestUserSignInDto): Promise<User>{
+        const { username } = name
+        const user = await this.userModel.create({username, role: 'guest'})
+        return user
+    }
+
+
 }

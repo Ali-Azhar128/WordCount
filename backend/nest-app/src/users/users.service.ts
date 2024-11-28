@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserDao } from './userDao.service.js';
 import { userDto } from './user.dto.js';
 import { userSignupDto } from './userSignup.dto.js';
+import { guestUserSignInDto } from './guestUserSignIn.dto.js';
 
 @Injectable()
 export class UsersService {
@@ -19,5 +20,9 @@ export class UsersService {
 
     async create(userSignupDto: userSignupDto): Promise<any> {
         return this.userDao.create(userSignupDto)
+    }
+
+    async createGuest(username: guestUserSignInDto): Promise<any> {
+        return this.userDao.createGuest(username)
     }
 }

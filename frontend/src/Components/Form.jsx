@@ -10,7 +10,12 @@ import io from 'socket.io-client'
 import CustomNotification from "./Notification"
 
 
-const socket = io('http://localhost:3000')
+const socket = io('http://localhost:3000',
+  {
+    reconnectionAttempts: 5,
+    reconnectionDelay: 5000,
+  }
+)
 
 const Form = () => {
     //states

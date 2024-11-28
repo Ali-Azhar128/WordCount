@@ -7,6 +7,7 @@ import { JwtAuthGuard } from "./jwt/jwt-auth.guard.js";
 import { userDto } from "../users/user.dto.js";
 import { RequestWithUser } from "./jwt/request-with-user.interface.js";
 import { userSignupDto } from "../users/userSignup.dto.js";
+import { guestUserSignInDto } from "../users/guestUserSignIn.dto.js";
 
 
 @Controller('auth')
@@ -57,6 +58,22 @@ export class AuthController{
     @Get('profile')
     getProfile(@Request() req) {
         return req.user;
+    }
+
+    @Post('guestLogin')
+    async guestLogin(
+        @Body() username: guestUserSignInDto,
+        @Res() res: Response
+    ) {
+        try {
+            const payload = await this.authService.guestLogin(username)
+            const access_token = payload.access_token
+            const user = await this.authService.getPayloadFromToken(access_token)
+            res.status(200).json({access_token, user})
+        } catch (error) {
+            return res.status(400).json(error.message)
+        }
+
     }
     
 }

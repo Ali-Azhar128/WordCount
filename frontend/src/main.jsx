@@ -13,6 +13,7 @@ import {
 import MainPage from './Pages/MainPage.jsx'
 import LoginPage from './Pages/LoginPage.jsx'
 import UserLoginForm from './Components/LoginComponent/UserLoginForm.jsx'
+import GuestSigninComponent from './Components/LoginComponent/GuestSigninComponent.jsx'
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: '/register',
     element: <UserLoginForm/>
+  },
+  {
+    path: '/guestLogin',
+    element: <GuestSigninComponent/>
   }
 ])
 

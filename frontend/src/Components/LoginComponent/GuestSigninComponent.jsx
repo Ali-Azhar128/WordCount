@@ -2,43 +2,37 @@ import React, { useState } from 'react'
 import TextField from '@mui/material/TextField'
 import { Button, Container, Typography, Box, Paper, Avatar, Divider } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useLoginMutation } from '../../Slices/usersApiSlices'
+import { useGuestLoginMutation } from '../../Slices/usersApiSlices'
 import { toast } from 'react-toastify'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { setLoginInfo } from '../../Slices/usersSlice'
 import LoadingButton from '@mui/lab/LoadingButton';
 
-const LoginForm = () => {
-  const [email, setEmail] = useState('')
-  const [pass, setPass] = useState('')
+const GuestSigninComponent = () => {
+  const [username, setUsername] = useState('')
 
   // React Router DOM
   const navigate = useNavigate()
   // Redux
-  const [login, {isLoading, isError}] = useLoginMutation()
+  const [login, {isLoading, isError}] = useGuestLoginMutation()
   const dispatch = useDispatch()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = { email, pass };
-    console.log(email + pass, 'All data');
+    
+    console.log(username, 'username')
     try {
-      const res = await login(user).unwrap();
+      const res = await login(username).unwrap();
       console.log('Success login', res);
       dispatch(setLoginInfo(res.user));
-      navigate('/');
+      navigate('/main');
     } catch (error) {
       toast.error('Invalid credentials');
     }
   };
 
-  const handleGuestLogin = () => {
-    // dispatch(setLoginInfo({ role: 'guest',
-    //   username: 'Guest',
-    //  })); 
-    navigate('/guestLogin'); 
-  };
+  
 
 
   return (
@@ -62,23 +56,12 @@ const LoginForm = () => {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
               autoFocus
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              onChange={(e) => setPass(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
             />
             <LoadingButton
             loading={isLoading}
@@ -91,16 +74,8 @@ const LoginForm = () => {
               {isLoading ? 'Logging in...' : 'Sign In'}
             </LoadingButton>
             <Divider sx={{ width: '100%', my: 2 }} />
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={handleGuestLogin}
-            sx={{ mt: 1, mb: 2 }}
-          >
-            Sign In as Guest
-          </Button>
           <Typography>
-            Don't have an account? <Link to="/register">Register</Link>
+            Already have an account? <Link to="/login">Login</Link>
           </Typography>
           </Box>
         </Box>
@@ -109,4 +84,4 @@ const LoginForm = () => {
   )
 }
 
-export default LoginForm
+export default GuestSigninComponent

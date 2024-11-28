@@ -420,7 +420,7 @@ const socket = io('http://localhost:3000')
                   size="small"
                   siblingCount={0}
                   boundaryCount={1}
-                  onChange={(event, page) => dispatch(setPageNumber(page))}
+                  onChange={(_, page) => dispatch(setPageNumber(page))}
                 />
               </Stack>
             </PaginationContainer>

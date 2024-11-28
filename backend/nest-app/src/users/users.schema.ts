@@ -8,7 +8,7 @@ export class User{
     @Prop({ required: true })
     username: string
 
-    @Prop({ required: true })
+    @Prop()
     password: string
 
     @Prop()
@@ -17,7 +17,7 @@ export class User{
     @Prop()
     role: string
 
-    @Prop({required: true})
+    @Prop()
     email: string
 
 }

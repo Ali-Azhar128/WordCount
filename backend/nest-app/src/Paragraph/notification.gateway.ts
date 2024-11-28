@@ -3,8 +3,8 @@ import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
-    origin: '*', // Adjust this to your frontend's URL
-  }
+    origin: '*', 
+  },
 })
 export class NotificationGateway {
   @WebSocketServer()
