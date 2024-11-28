@@ -28,6 +28,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { useMediaQuery } from '@mui/material'
 
 
 const drawerWidth = 240;
@@ -111,6 +112,8 @@ const socket = io('http://localhost:3000')
   const [page, setPage] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false);
   const [refetchData, setRefetchData] = useState(false);
+
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   // redux
   const dispatch = useDispatch();
@@ -228,7 +231,10 @@ const socket = io('http://localhost:3000')
   }, [data, dispatch, refetchData]);
 
   useEffect(() => {
-    setIsAdmin(user?.role === 'admin');
+    if(user){
+      setIsAdmin(user?.role === 'admin');
+    }
+    
   }
 , [user]);
 
@@ -256,37 +262,39 @@ const socket = io('http://localhost:3000')
               </div>
               <div className='flex space-x-2 items-center'>
               {isAdmin && (
+               !isSmallScreen && (
                 <>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: theme.palette.primary.main,
-                      color: theme.palette.primary.contrastText,
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    }}
-                  >
-                    Analytics
-                  </Button>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: theme.palette.primary.main,
-                      color: theme.palette.primary.contrastText,
-                      '&:hover': {
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                    }}
-                  >
-                    Dashboard
-                  </Button>
-                 
-                </>
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.dark,
+                    },
+                  }}
+                >
+                  Analytics
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.primary.contrastText,
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.dark,
+                    },
+                  }}
+                >
+                  Dashboard
+                </Button>
+               
+              </>
+               )
               )}
                {user ? (
                 <>
-                {user.role === 'admin' ? (<Avatar sx={{ m: 1, bgcolor: 'green',
+                {user && user?.role === 'admin' ? (<Avatar sx={{ m: 1, bgcolor: 'green',
                     borderRadius: '50%',
                    }}>
                   A
@@ -298,7 +306,6 @@ const socket = io('http://localhost:3000')
                   </Avatar>
                 )}
                 <LogoutIcon onClick={handleLogout} className='hover cursor-pointer'/>
-                
                 </>
               ): (<>
                 <Button
@@ -382,7 +389,7 @@ const socket = io('http://localhost:3000')
                               </div>
                             {
                               user && ( 
-                                user.role === 'admin' && (
+                                user?.role === 'admin' && (
                                   <div className='flex'>
                                     <FlagIcon onClick={(e) => toggleFlagItem(e, text.id, text.createdBy, text.isFlagged)} sx={{ color: text.isFlagged ? 'white' : 'black' }} />
                                     <DeleteIcon onClick={(e) => handleDelete(e, text.id)} sx={{ color: 'black' }} />

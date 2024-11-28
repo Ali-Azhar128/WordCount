@@ -15,7 +15,13 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
         providesTags: ["Paragraph"],
 
         searchParaWithPageNumber: builder.query({
-          query: ({keyword, page}) => `/searchPage?keyword=${keyword}&page=${page}&perPage=5`,
+          query: ({keyword, page, userId, role}) => {`/searchPage?keyword=${keyword}&page=${page}&perPage=5&userId=${userId}&role=${role}`,
+        console.log(role, 'roles')
+        console.log(userId, 'userId')
+      
+      },
+       
+          
       }),
       providesTags: ["Paragraph"],
       

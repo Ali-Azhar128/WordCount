@@ -181,13 +181,28 @@ export class ParaService {
 
     }
 
-    async getDocsWithPagination(page: number = 1, perPage: number = 5): Promise<any> {
-        const totalDocs = await this.paraModel.countDocuments().exec();
-        const docs = await this.paraModel
-          .find()
-          .skip((page - 1) * perPage)
-          .limit(perPage)
-          .exec();
+    async getDocsWithPagination(page: number = 1, perPage: number = 5, userId: string, role: string): Promise<any> {
+        let totalDocs
+        let docs;
+        if(role === 'admin') {
+            console.log('in admin')
+            totalDocs = await this.paraModel.find({}).countDocuments().exec();
+               
+            docs = await this.paraModel
+            .find()
+            .skip((page - 1) * perPage)
+            .limit(perPage)
+            .exec();
+        } else {
+            totalDocs = await this.paraModel.find({createdBy: userId}).countDocuments().exec();
+               
+            docs = await this.paraModel
+            .find({createdBy: userId})
+            .skip((page - 1) * perPage)
+            .limit(perPage)
+            .exec();
+        }
+
           const totalPages = Math.ceil(totalDocs / perPage);
         return {docs, totalPages}; 
       }

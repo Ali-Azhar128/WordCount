@@ -4,7 +4,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { useSearchParagraphsQuery, useSearchParaWithPageNumberQuery  } from '../Slices/paragraphsApiSlice';
+import { useSearchParagraphsQuery } from '../Slices/paragraphsApiSlice';
 import { setAllParas } from '../Slices/paragraphsSlice';
 
 const SearchField = ({ setParagraph }) => {
@@ -18,7 +18,8 @@ const SearchField = ({ setParagraph }) => {
     // const { data: searchResults, isLoading, isError } = useSearchParagraphsQuery(search)
     const pageNumber = useSelector(state => state.paragraphs.pageNumber)
     const paragraphsFromRedux = useSelector(state => state.paragraphs.paragraphs)
-    const { data: searchResultsWithPage, isLoading: isLoadingWithPage, isError: isErrorWithPage } = useSearchParaWithPageNumberQuery({
+     const user = useSelector(state => state.login.userInfo)
+    const { data: searchResultsWithPage, isLoading: isLoadingWithPage, isError: isErrorWithPage } = useSearchParagraphsQuery({
         keyword: search, 
         page: pageNumber
     })

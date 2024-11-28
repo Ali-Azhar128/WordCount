@@ -38,11 +38,11 @@ const Form = () => {
     const paragraphId = useSelector(state => state.paragraphs.paragraphId)
     const { data: docs, isLoading: loadingDocs, isError: isErrorWithPage, refetch } = useSearchParaWithPageNumberQuery({
       keyword: search ? search : '', 
-      page: pageNumber
+      page: pageNumber,
+      userId: user.sub,
+      role: user.role
   })
     const [addParagraph, { isLoading, isError, data: addParagraphData }] = useAddParagraphMutation()
-    const {data: paraData} = useFindByIDQuery(paraId)
-
     //functions
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -51,6 +51,9 @@ const Form = () => {
 
     const addData = async (text) => {
       try {
+        if(text.trim().length === 0) {
+          return
+        }
 
         const result = await addParagraph({ paragraph: text, ip, user: user.sub }).unwrap()
         setCount(result.count)
@@ -81,12 +84,6 @@ const Form = () => {
         
       }
     }, [docs])
-
-
-    useEffect(() => {
-      console.log(paraData, 'paraData')
-    }, [paraData, paraId])
-
     
     useEffect(() => {
       const socket = io('http://localhost:3000')
@@ -99,14 +96,7 @@ const Form = () => {
           console.log('User connected to socket:', finalId);
         }
       };
-      // if (user) {
-      //   let finalId = userId === '' ? user.sub : userId
-      //   console.log(finalId, 'finalId')
-      //   socket.emit('join', finalId); 
-      //   console.log('User connected to socket:', finalId);
-      // }
-      
-      
+     
       socket.on('notification', (data) => {
         
         console.log('Received notification:', data)
@@ -173,7 +163,7 @@ const Form = () => {
         refetch()
         getDocs()
       }
-    }, [sortOrder, loadingDocs, docs])
+    }, [sortOrder, loadingDocs, docs, user])
 
    
     return (
@@ -183,7 +173,7 @@ const Form = () => {
             <form onSubmit={handleSubmit} className="form mt-20" >
                 <div className="textInput flex flex-col">
                     <label className="text-2xl font-bold mb-4" htmlFor="para">Enter Your Paragraph</label>
-                    <textarea className="p-1 bg-white w-[90%] border-2 rounded-md" value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={50} id='para'/>
+                    <textarea  className="p-1  bg-white w-[90%] border-2 rounded-md overflow-y-auto resize-none h-[180px]" value={text} onChange={(e) => setText(e.target.value)} rows={4} cols={50} id='para'/>
                 </div>
                 <MuiButton loading={isLoading} text={'submit'} refetch={refetch}/>
             </form>
