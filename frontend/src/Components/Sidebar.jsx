@@ -119,6 +119,12 @@ const socket = io('http://localhost:3000')
   const pageNumber = useSelector(state => state.paragraphs.pageNumber);
   const userId = useSelector(state => state.paragraphs.userId)
 
+  useEffect(() => {
+    if (para){
+      console.log(para, 'para frommm')
+    }
+  }, [para])
+
   const { data, error, isLoading, refetch: refetchPage } = useGetPageQuery(pageNumber);
   const { data: searchResultsWithPage, isLoading: isLoadingWithPage, refetch } = useSearchParaWithPageNumberQuery({
     keyword: search,
@@ -229,11 +235,12 @@ const socket = io('http://localhost:3000')
  }, [searchResultsWithPage])
 
   useEffect(() => {
-    if (data) {
-      dispatch(setAllParas(data));
+    if (searchResultsWithPage) {
+      console.log(searchResultsWithPage.docs, 'dataaaa')
+      dispatch(setAllParas(searchResultsWithPage.docs));
       console.log('data refetched')
     }
-  }, [data, dispatch, refetchData]);
+  }, [data, dispatch, refetchData, searchResultsWithPage]);
 
   useEffect(() => {
     setIsAdmin(user?.role === 'admin');

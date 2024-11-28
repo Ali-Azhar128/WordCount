@@ -200,9 +200,15 @@ export class ParaService {
           .limit(perPage)
           .exec();
         }
+        const anonDocs = await this.paraModel.find({type: 'guest'}).exec();
 
-          const totalPages = Math.ceil(totalDocs / perPage);
-        return {docs, totalPages}; 
+        const allDocs = [...docs, ...anonDocs];
+        const totalPages = Math.ceil((totalDocs + anonDocs.length) / perPage);
+        if(page === Math.ceil((totalDocs + anonDocs.length) / perPage)){
+            return {docs: allDocs, totalPages: totalPages};
+        }else{
+            return {docs, totalPages}
+        }
       }
 
       async searchDocsWithPagination(keyword: string, page: number = 1, perPage: number = 5, userId: string, role: string): Promise<{ docs: ParaDocument[], totalPages: number }> {
@@ -224,18 +230,8 @@ export class ParaService {
                 { $limit: perPage }
               ]).exec();
         }
-
-
-        // const totalDocs = await this.paraModel.countDocuments({ paragraph: { $regex: regex } }).exec();
         
-         const totalPages = Math.ceil(totalDocs / perPage);
-        
-        // const docs = await this.paraModel.aggregate([
-        //     { $skip: (page - 1) * perPage },
-        //     { $match: { paragraph: { $regex: regex } } },
-        //     { $limit: perPage }
-        //   ]).exec();
-        
+         const totalPages = Math.ceil(totalDocs / perPage);    
         return { docs, totalPages };
     }
 
