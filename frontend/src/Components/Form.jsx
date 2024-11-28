@@ -54,7 +54,7 @@ const Form = () => {
     const addData = async (text) => {
       try {
 
-        const result = await addParagraph({ paragraph: text, ip, user: user.sub }).unwrap()
+        const result = await addParagraph({ paragraph: text, ip, user: user.sub, type: user.role }).unwrap()
         setCount(result.count)
         setUrl(`http://localhost:3000${result.pdfDownloadLink}`)
         setData(result.pdfDownloadLink)

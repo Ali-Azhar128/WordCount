@@ -77,7 +77,7 @@ export class ParaController{
       if (!keyword) {
         docs = await this.paraService.getDocsWithPagination(Number(page), Number(perPage), userId, role);
       } else {
-        docs = await this.paraService.searchDocsWithPagination(keyword, Number(page), Number(perPage));
+        docs = await this.paraService.searchDocsWithPagination(keyword, Number(page), Number(perPage), userId, role);
       }
       res.json(docs);
     } catch (error) {

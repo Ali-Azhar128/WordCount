@@ -120,7 +120,8 @@ export class ParaService {
     }
 
     async getCount(createParaDto: CreateParaDto): Promise<{ count: number, id: string }> {
-        const { paragraph, ip, user } = createParaDto;
+        const { paragraph, ip, user, type } = createParaDto;
+        console.log(type, 'type')
         const preprocessedParagraph = contractions.expand(paragraph);
         let tokens: string[] = [];
 
@@ -158,7 +159,7 @@ export class ParaService {
         console.log(tokens);
         let count = tokens.length;
 
-        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false, createdBy: user });
+        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false, createdBy: user, type: type });
         await savedPara.save();
         return { count, id: savedPara.id };
     }
@@ -200,29 +201,40 @@ export class ParaService {
           .exec();
         }
 
-        // const totalDocs = await this.paraModel.countDocuments({createdBy: userId}).exec();
-
-        // const docs = await this.paraModel
-        //   .find({createdBy: userId})
-        //   .skip((page - 1) * perPage)
-        //   .limit(perPage)
-        //   .exec();
           const totalPages = Math.ceil(totalDocs / perPage);
         return {docs, totalPages}; 
       }
 
-      async searchDocsWithPagination(keyword: string, page: number = 1, perPage: number = 5): Promise<{ docs: ParaDocument[], totalPages: number }> {
+      async searchDocsWithPagination(keyword: string, page: number = 1, perPage: number = 5, userId: string, role: string): Promise<{ docs: ParaDocument[], totalPages: number }> {
         const regex = new RegExp(keyword, 'i');
+        let totalDocs;
+        let docs
+        if(role === 'admin') {
+            totalDocs = await this.paraModel.countDocuments({ paragraph: { $regex: regex } }).exec();
+            docs = await this.paraModel.aggregate([
+                { $skip: (page - 1) * perPage },
+                { $match: { paragraph: { $regex: regex } } },
+                { $limit: perPage }
+              ]).exec();
+        }else {
+            totalDocs = await this.paraModel.countDocuments({ paragraph: { $regex: regex }, createdBy: userId }).exec();
+            docs = await this.paraModel.aggregate([
+                { $skip: (page - 1) * perPage },
+                { $match: { paragraph: { $regex: regex }, createdBy: userId } },
+                { $limit: perPage }
+              ]).exec();
+        }
+
+
+        // const totalDocs = await this.paraModel.countDocuments({ paragraph: { $regex: regex } }).exec();
         
-        const totalDocs = await this.paraModel.countDocuments({ paragraph: { $regex: regex } }).exec();
+         const totalPages = Math.ceil(totalDocs / perPage);
         
-        const totalPages = Math.ceil(totalDocs / perPage);
-        
-        const docs = await this.paraModel.aggregate([
-            { $skip: (page - 1) * perPage },
-            { $match: { paragraph: { $regex: regex } } },
-            { $limit: perPage }
-          ]).exec();
+        // const docs = await this.paraModel.aggregate([
+        //     { $skip: (page - 1) * perPage },
+        //     { $match: { paragraph: { $regex: regex } } },
+        //     { $limit: perPage }
+        //   ]).exec();
         
         return { docs, totalPages };
     }

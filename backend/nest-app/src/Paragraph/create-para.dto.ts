@@ -14,4 +14,7 @@ export class CreateParaDto{
     @IsString()
     user: string
 
+    @IsString()
+    type: string
+
 }

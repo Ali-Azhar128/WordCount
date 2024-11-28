@@ -28,6 +28,9 @@ export class Paragraph{
 
   @Prop()
   createdBy: string
+
+  @Prop()
+  type: string
 }
 
 export const ParaSchema = SchemaFactory.createForClass(Paragraph)
