@@ -29,6 +29,7 @@ export class NotificationGateway {
     notifications.forEach(async notification => {
       console.log(notification.paragraphId, 'notification.paragraphId');
       await this.notificationService.markNotificationAsReceived(notification.paragraphId);
+      this.server.to(userId).emit('notificationReceived', { id: notification.paragraphId }); // Emit event
     });
 
     await this.notificationService.deleteNotificationsForUser(userId);

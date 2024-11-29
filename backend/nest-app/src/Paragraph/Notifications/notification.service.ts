@@ -13,6 +13,7 @@ export class NotificationService {
 
   async createNotification(userId: string, message: string, paragraphId: string): Promise<Notification> {
     const notification = new this.notificationModel({ userId, message, paragraphId });
+    await this.paragraphModel.updateOne({ _id: paragraphId }, { isNotified: false }).exec(); // Set isNotified to false
     return notification.save();
   }
 

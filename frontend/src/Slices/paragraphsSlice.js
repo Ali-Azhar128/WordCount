@@ -51,11 +51,19 @@ export const paragraphSlice = createSlice({
     setParagraphId: (state, action) => {
       console.log(action.payload, 'payload')
       state.paragraphId = action.payload
+    },
+
+    updateParagraphNotification: (state, action) => {
+      const { id, isNotified } = action.payload;
+      const paragraph = state.paragraphs.find(p => p.id === id);
+      if (paragraph) {
+        paragraph.isNotified = isNotified;
+      }
     }
   }
 })
 
 // Action creators are generated for each case reducer function
-export const { setAllParas, setPageNumber, setUserIdToSendNotificationTo, setFlaggedItem,setParagraphId } = paragraphSlice.actions
+export const { setAllParas, setPageNumber, setUserIdToSendNotificationTo, setFlaggedItem,setParagraphId, updateParagraphNotification } = paragraphSlice.actions
 
 export default paragraphSlice.reducer

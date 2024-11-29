@@ -19,7 +19,7 @@ import SortIcon from '@mui/icons-material/Sort';
 import { Avatar, Button, Chip, Pagination, Stack, TextField, Tooltip } from '@mui/material';
 import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation, useDeleteItemMutation } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAllParas, setFlaggedItem, setPageNumber, setParagraphId, setUserIdToSendNotificationTo } from '../Slices/paragraphsSlice';
+import { setAllParas, setFlaggedItem, setPageNumber, setParagraphId, setUserIdToSendNotificationTo, updateParagraphNotification } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
 import FlagIcon from '@mui/icons-material/Flag';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -241,6 +241,17 @@ const socket = io('http://localhost:3000')
     setIsAdmin(user?.role === 'admin');
   }
 , [user]);
+
+useEffect(() => {
+  socket.on('notificationReceived', (data) => {
+    console.log('Notification received:', data);
+    dispatch(updateParagraphNotification({ id: data.id, isNotified: true }));
+  });
+
+  return () => {
+    socket.off('notificationReceived');
+  };
+}, [dispatch]);
 
 
   return (
