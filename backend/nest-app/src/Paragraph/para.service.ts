@@ -200,14 +200,27 @@ export class ParaService {
           .limit(perPage)
           .exec();
         }
-        const anonDocs = await this.paraModel.find({type: 'guest'}).exec();
-
-        const allDocs = [...docs, ...anonDocs];
-        const totalPages = Math.ceil((totalDocs + anonDocs.length) / perPage);
-        if(page === Math.ceil((totalDocs + anonDocs.length) / perPage)){
-            return {docs: allDocs, totalPages: totalPages};
+        
+        let allDocs;
+        let anonDocs;
+        let totalPages
+        if(role === 'admin') {
+            allDocs = docs;
+            totalPages = Math.ceil(totalDocs / perPage);
+            if(page === Math.ceil(totalDocs / perPage)){
+                return {docs: allDocs, totalPages: totalPages};
+            }else{
+                return {docs, totalPages}
+            }
         }else{
-            return {docs, totalPages}
+            anonDocs = await this.paraModel.find({type: 'guest'}).exec();
+            allDocs = [...docs, ...anonDocs];
+            totalPages = Math.ceil((totalDocs + anonDocs.length) / perPage);
+            if(page === Math.ceil((totalDocs + (anonDocs.length)) / perPage)){
+                return {docs: allDocs, totalPages: totalPages};
+            }else{
+                return {docs, totalPages}
+            }
         }
       }
 
