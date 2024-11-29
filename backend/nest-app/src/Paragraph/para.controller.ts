@@ -74,12 +74,13 @@ export class ParaController{
     @Query('perPage') perPage: number = 5,
     @Query('userId') userId: string,
     @Query('role') role: string,
-    @Res() res: Response
+    @Res() res: Response,
+    @Req() req: Request
   ): Promise<any> {
     try {
       let docs;
       if (!keyword) {
-        docs = await this.paraService.getDocsWithPagination(Number(page), Number(perPage), userId, role);
+        docs = await this.paraService.getDocsWithPagination(Number(page), Number(perPage), userId, req);
       } else {
         docs = await this.paraService.searchDocsWithPagination(keyword, Number(page), Number(perPage), userId, role);
       }

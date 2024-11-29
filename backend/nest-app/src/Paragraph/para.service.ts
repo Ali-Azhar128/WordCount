@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { CreateParaDto } from "./create-para.dto.js";
 import { ParaDocument, Paragraph } from "./para.schema.js";
 import { Model } from "mongoose";
@@ -11,6 +11,9 @@ import { ParaDOW } from "./paragraphDow.service.js";
 import { franc } from "franc";
 import {iso6392} from 'iso-639-2'
 import { NotificationGateway } from "./notification.gateway.js";
+import { Request } from "express";
+import { extractTokenFromRequest } from "./Utils/auth.utils.js";
+import { JwtService } from '@nestjs/jwt';
 
 interface Token {
     value: string,
@@ -26,7 +29,8 @@ export class ParaService {
     constructor
     (@InjectModel(Paragraph.name) private paraModel: Model<ParaDocument>,
      private readonly paraDow: ParaDOW,
-     private readonly notificationGateway: NotificationGateway
+     private readonly notificationGateway: NotificationGateway,
+     private readonly jwtService: JwtService
     ) {
 
         this.tokenizer = new winkTokenizer()
@@ -182,12 +186,23 @@ export class ParaService {
 
     }
 
-    async getDocsWithPagination(page: number = 1, perPage: number = 5, userId: string, role: string): Promise<any> {
+    async getDocsWithPagination(page: number = 1, perPage: number = 5, userId: string, req: Request): Promise<any> {
         let totalDocs;
         let docs
         let totalPages
         let allDocs
         let anonDocs;
+
+        const token = extractTokenFromRequest(req);
+        // if (!token) {
+        //   throw new UnauthorizedException('Token not found');
+        // }
+
+        const payload = await this.jwtService.verifyAsync(token, { secret: 'abc123' });
+
+        const { role } = payload;
+        console.log(role, 'role')
+
         if(role === 'admin') {
             totalDocs = await this.paraModel.countDocuments().exec();
             docs = await this.paraModel
