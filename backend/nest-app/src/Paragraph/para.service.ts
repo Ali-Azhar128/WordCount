@@ -159,7 +159,7 @@ export class ParaService {
         console.log(tokens);
         let count = tokens.length;
 
-        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false, createdBy: user, type: type });
+        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false, createdBy: user, type: type, isNotified: false });
         await savedPara.save();
         return { count, id: savedPara.id };
     }

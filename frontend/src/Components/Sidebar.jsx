@@ -243,15 +243,21 @@ const socket = io('http://localhost:3000')
 , [user]);
 
 useEffect(() => {
-  socket.on('notificationReceived', (data) => {
-    console.log('Notification received:', data);
-    dispatch(updateParagraphNotification({ id: data.id, isNotified: true }));
+  // socket.on('notificationReceived', (data) => {
+  //   console.log('Notification received:', data);
+  //   dispatch(updateParagraphNotification({ id: data.id, isNotified: true }));
+  // });
+  socket.on('notificationStatusUpdate', (data) => {
+    console.log('Notification status update:', data);
+    dispatch(updateParagraphNotification({ id: data.id, isNotified: data.isNotified }));
   });
+  refetch()
 
   return () => {
     socket.off('notificationReceived');
+    socket.off('notificationStatusUpdate');
   };
-}, [dispatch]);
+}, [dispatch, searchResultsWithPage]);
 
 
   return (
