@@ -8,6 +8,9 @@ import { setAllParas } from "../Slices/paragraphsSlice"
 import { useGetAllParagraphsQuery, useAddParagraphMutation, useSearchParaWithPageNumberQuery, useFindByIDQuery } from "../Slices/paragraphsApiSlice"
 import io from 'socket.io-client'
 import CustomNotification from "./Notification"
+import { Typography } from "@mui/material"
+import { Link } from "react-router-dom"
+import { removeUserInfo } from "../Slices/usersSlice"
 
 
 
@@ -76,6 +79,10 @@ const Form = () => {
         dispatch(setAllParas(sortedData))
         console.log(docs, 'docs api slice')
     };
+
+    const handleLogoutGuest = () => {
+      dispatch(removeUserInfo())
+    }
 
     //For reference
     useEffect(() => {
@@ -181,7 +188,6 @@ const Form = () => {
     return (
         <div className="h-[100%] flex flex-col items-center justify-center">
           <PersistentDrawerLeft paragraphs={paragraphs} setText={setText} setCount={setCount} setUrl={setUrl} toggle={toggleSortOrder} search={search} setSearch={setSearch} setData={setData} setFlagged={setFlagged}/>
-          {/* <SearchField setParagraph={setParagraphs}/> */}
             <form onSubmit={handleSubmit} className="form mt-20" >
                 <div className="textInput flex flex-col">
                     <label className="text-2xl font-bold mb-4" htmlFor="para">Enter Your Paragraph</label>
@@ -190,12 +196,15 @@ const Form = () => {
                 <MuiButton loading={isLoading} text={'submit'} refetch={refetch}/>
             </form>
             <div>
-                <p className="mt-2">Words in document: {count}</p>
+               {user.role !== 'anonymous' &&  <p className="mt-2">Words in document: {count}</p>}
             </div>
             {url && 
             <>
                 <MuiButton text={'Download PDF'} url={url} onClick={onClick} />
             </>}
+            {user.role === 'anonymous' && <Typography sx={{
+              mt: 2,
+            }}>Explore All Features <Link onClick={handleLogoutGuest} to={'/login'}>Login</Link></Typography>}
             {user.role !== 'admin' && <CustomNotification open={open} handleClose={handleClose} message={message} paraId={paraId} setText={setText} setCount={setCount} setUrl={setUrl} setData={setData}/>}
         </div>
     )

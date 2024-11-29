@@ -1,11 +1,21 @@
 import LoadingButton from '@mui/lab/LoadingButton';
 import { CircularProgress } from '@mui/material';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 const MuiButton = ({ url, text, loading = false, onClick, refetch }) => {
+  const user = useSelector(state => state.login.userInfo)
+  useEffect(() => {
+    if(user){
+      console.log(user.role === 'anonymous', 'role')
+      
+    }
+  }, [user])
   return (
     <div>
       {url ? (
        <LoadingButton
+          disabled={user.role === 'anonymous'}
          loading={loading}
          type="button"
          onClick={onClick}
@@ -26,6 +36,7 @@ const MuiButton = ({ url, text, loading = false, onClick, refetch }) => {
        </LoadingButton>
       ) : (
         <LoadingButton
+        disabled={user.role === 'anonymous'}
         onClick={() => {
           refetch()
         }}

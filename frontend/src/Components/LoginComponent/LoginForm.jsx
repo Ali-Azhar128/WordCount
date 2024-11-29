@@ -51,54 +51,48 @@ const LoginForm = () => {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 8 }}>
-        <Box display="flex" flexDirection="column" alignItems="center">
-        <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5" sx={{
-            fontWeight: 'bold',
-          }}>
-            Sign In
-          </Typography>
-          <Typography component="h7" variant="h7">
-            Please sign in to continue
-          </Typography>
-          
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              onChange={(e) => setPass(e.target.value)}
-            />
-            <LoadingButton
+    <Paper elevation={6} sx={{ padding: 4, marginTop: 8, borderRadius: 2 }}>
+      <Box display="flex" flexDirection="column" alignItems="center">
+        <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component="h1" variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
+          Sign In
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            onChange={(e) => setPass(e.target.value)}
+          />
+          <LoadingButton
             loading={isLoading}
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2, fontWeight: 'bold' }}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Logging in...' : 'Sign In'}
-            </LoadingButton>
-            <Divider sx={{ width: '100%', my: 2 }} />
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2, fontWeight: 'bold' }}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'Sign In'}
+          </LoadingButton>
+          <Divider sx={{ width: '100%', my: 2 }} />
           <Button
             fullWidth
             variant="outlined"
@@ -107,22 +101,21 @@ const LoginForm = () => {
           >
             Sign In as Guest
           </Button>
-          <Typography>
+          <Button
+            fullWidth
+            variant="outlined"
+            onClick={handleAnonymousClick}
+            sx={{ mt: 1, mb: 2 }}
+          >
+            Continue without Signup
+          </Button>
+          <Typography align="center" sx={{ mt: 2 }}>
             Don't have an account? <Link to="/register">Register</Link>
           </Typography>
-          <Typography>
-            OR
-          </Typography>
-          <Button
-          variant='outlined'
-          onClick={handleAnonymousClick}
-          >
-            Continue using without signup
-          </Button>
-          </Box>
         </Box>
-      </Paper>
-    </Container>
+      </Box>
+    </Paper>
+  </Container>
   )
 }
 

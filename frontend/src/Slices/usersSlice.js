@@ -12,9 +12,14 @@ export const usersSlice = createSlice({
             state.userInfo = action.payload;
             localStorage.setItem("userInfo", JSON.stringify(action.payload));
         },
+
+        removeUserInfo: (state) => {
+            state.userInfo = null;
+            localStorage.removeItem("userInfo");
+        }
     },
 });
 
-export const { setLoginInfo } = usersSlice.actions;
+export const { setLoginInfo, removeUserInfo } = usersSlice.actions;
 
 export default usersSlice.reducer;
