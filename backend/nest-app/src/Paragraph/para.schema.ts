@@ -31,6 +31,9 @@ export class Paragraph{
 
   @Prop()
   type: string
+
+  @Prop({ default: false })
+  isNotified: boolean
 }
 
 export const ParaSchema = SchemaFactory.createForClass(Paragraph)

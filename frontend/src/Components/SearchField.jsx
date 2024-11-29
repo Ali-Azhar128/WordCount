@@ -99,7 +99,6 @@ const SearchField = ({ setParagraph }) => {
                 getOptionLabel={(option) => truncateText(option?.para || '', 75)} 
                 options={paragraphs}
                 loading={loading}
-                
                 renderInput={(params) => (
                     <TextField
                     onChange={(e) => {

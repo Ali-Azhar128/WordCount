@@ -25,6 +25,7 @@ export const paragraphSlice = createSlice({
           id: item._id,
           isFlagged: item.isFlagged,
           createdBy: item.createdBy,
+          isNotified: item.isNotified
         }
         console.log(newItem, 'newItem')
         state.paragraphs.push(newItem);

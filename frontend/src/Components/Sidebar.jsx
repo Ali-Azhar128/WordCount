@@ -119,12 +119,6 @@ const socket = io('http://localhost:3000')
   const pageNumber = useSelector(state => state.paragraphs.pageNumber);
   const userId = useSelector(state => state.paragraphs.userId)
 
-  useEffect(() => {
-    if (para){
-      console.log(para, 'para frommm')
-    }
-  }, [para])
-
   const { data, error, isLoading, refetch: refetchPage } = useGetPageQuery(pageNumber);
   const { data: searchResultsWithPage, isLoading: isLoadingWithPage, refetch } = useSearchParaWithPageNumberQuery({
     keyword: search,
@@ -179,6 +173,7 @@ const socket = io('http://localhost:3000')
       console.log(flagged, 'text.isFlagged')
       toast.success(res)
       refetchPage()
+      refetch()
       console.log('here')
     } catch (error) {
       console.error(error)
@@ -374,7 +369,8 @@ const socket = io('http://localhost:3000')
             <ListContainer>
               <List>
                 {para.map((text, index) => (
-                  <ListItem className={`${text.isFlagged && 'bg-red-600'} ${text.isFlagged && 'text-white'} border-b-2 border border-white`} key={index} disablePadding>
+                  <ListItem 
+                  className={`${text.isFlagged && text.isNotified ? 'bg-red-600' : text.isFlagged ? 'bg-orange-600' : ''} ${text.isFlagged && 'text-white'} border-b-2 border border-white`} key={index} disablePadding>
                     <ListItemButton
                      onClick={() => {
                       setText(text.para)

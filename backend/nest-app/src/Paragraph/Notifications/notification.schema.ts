@@ -16,6 +16,9 @@ export class Notification {
 
   @Prop({ default: Date.now })
   createdAt: Date;
+
+  @Prop({ default: false })
+  received: boolean;
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);
