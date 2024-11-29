@@ -9,6 +9,7 @@ const usersSlice = apiSlice.injectEndpoints({
           url: "/auth/login",
           method: "POST",
           body: { email: user.email, pass: user.pass },
+          credentials: 'include'
         }
       ),
     }),
@@ -25,6 +26,7 @@ const usersSlice = apiSlice.injectEndpoints({
             username: user.username,
             role: user.role,
           },
+          credentials: 'include'
         }
       ),
     }),
@@ -34,6 +36,7 @@ const usersSlice = apiSlice.injectEndpoints({
         url: "/auth/guestLogin",
         method: "POST",
         body: { username },
+        credentials: 'include'
       }),
     }),
   }),

@@ -185,6 +185,9 @@ export class ParaService {
     async getDocsWithPagination(page: number = 1, perPage: number = 5, userId: string, role: string): Promise<any> {
         let totalDocs;
         let docs
+        let totalPages
+        let allDocs
+        let anonDocs;
         if(role === 'admin') {
             totalDocs = await this.paraModel.countDocuments().exec();
             docs = await this.paraModel
@@ -192,29 +195,33 @@ export class ParaService {
           .skip((page - 1) * perPage)
           .limit(perPage)
           .exec();
-        }else{
-            totalDocs = await this.paraModel.countDocuments({createdBy: userId}).exec();
-            docs = await this.paraModel
-          .find({createdBy: userId})
-          .skip((page - 1) * perPage)
-          .limit(perPage)
-          .exec();
-        }
-        
-        let allDocs;
-        let anonDocs;
-        let totalPages
-        if(role === 'admin') {
-            allDocs = docs;
-            totalPages = Math.ceil(totalDocs / perPage);
+          allDocs = docs;
+            totalPages = Math.ceil(totalDocs / perPage)
             if(page === Math.ceil(totalDocs / perPage)){
                 return {docs: allDocs, totalPages: totalPages};
             }else{
                 return {docs, totalPages}
             }
-        }else{
-            anonDocs = await this.paraModel.find({type: 'guest'}).exec();
+        }else if(role === 'guest'){
+            totalDocs = await this.paraModel.countDocuments({type: 'guest'}).exec();
+            docs = await this.paraModel
+          .find({type: 'guest'})
+          .skip((page - 1) * perPage)
+          .limit(perPage)
+          .exec();
+          totalPages = Math.ceil(totalDocs / perPage);
+          return {docs, totalPages} 
+        }
+        else{
+            totalDocs = await this.paraModel.countDocuments({createdBy: userId}).exec();
+            console.log(role, 'role')
+            docs = await this.paraModel
+          .find({createdBy: userId})
+          .skip((page - 1) * perPage)
+          .limit(perPage)
+          anonDocs = await this.paraModel.find({type: 'guest'}).exec();
             allDocs = [...docs, ...anonDocs];
+           
             totalPages = Math.ceil((totalDocs + anonDocs.length) / perPage);
             if(page === Math.ceil((totalDocs + (anonDocs.length)) / perPage)){
                 return {docs: allDocs, totalPages: totalPages};

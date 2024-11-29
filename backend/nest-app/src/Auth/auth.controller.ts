@@ -67,6 +67,11 @@ export class AuthController{
     ) {
         try {
             const payload = await this.authService.guestLogin(username)
+            res.cookie('jwt', payload.access_token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 3600000, 
+              });
             const access_token = payload.access_token
             const user = await this.authService.getPayloadFromToken(access_token)
             res.status(200).json({access_token, user})

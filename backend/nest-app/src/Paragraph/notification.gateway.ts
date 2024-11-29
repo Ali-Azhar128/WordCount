@@ -28,8 +28,6 @@ export class NotificationGateway {
 
     notifications.forEach(async notification => {
       await this.notificationService.markNotificationAsReceived(notification.paragraphId);
-      // this.server.to(userId).emit('notificationReceived', { id: notification.paragraphId }); // Emit event
-
       this.server.emit('notificationStatusUpdate', { id: notification.paragraphId, isNotified: true });
     });
 
@@ -42,9 +40,6 @@ export class NotificationGateway {
     console.log('Paragraph flagged with id: ', id.toString());
 
     const clients = this.server.sockets.adapter.rooms.get(userId);
-    console.log(clients.has(userId), 'clients.has(userId)')
-    const isUserConnected = clients && clients.has(userId);
-    console.log(isUserConnected, 'user connected');
     if(clients && clients.size > 1) {
       
       this.server.to(userId).emit('notification', {message, id});

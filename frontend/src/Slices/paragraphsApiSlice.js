@@ -13,6 +13,7 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
             query: (page) => `/getPage?page=${page}`,
         }),
         providesTags: ["Paragraph"],
+        
 
         searchParaWithPageNumber: builder.query({
           query: ({keyword, page, userId, role}) => `/searchPage?keyword=${keyword}&page=${page}&perPage=5&userId=${userId}&role=${role}`,
@@ -24,6 +25,7 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
             url: "/getCount",
             method: "POST",
             body: newParagraph,
+            credentials: 'include'
         }),
         providesTags: ["Paragraph"],
         }),
@@ -33,6 +35,7 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
               url: `/flagItem`,
               method: "PUT",
               body: {id},
+              credentials: 'include'
           }),
           invalidatesTags: ["Paragraph"],
       }),

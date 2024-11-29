@@ -37,8 +37,14 @@ import { RequestWithUser } from './request-with-user.interface';
     }
   
     private extractTokenFromHeader(request: Request): string | undefined {
+      // Check for token in Authorization header
       const [type, token] = request.headers.authorization?.split(' ') ?? [];
-      return type === 'Bearer' ? token : undefined;
+      console.log(request.cookies, 'cookies')
+        if(type === 'Bearer' && token){
+          return token
+        }
+        // Check for token in cookies
+      return request.cookies?.jwt
     }
   }
   

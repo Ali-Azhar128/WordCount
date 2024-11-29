@@ -4,6 +4,9 @@ import { CreateParaDto } from "./create-para.dto.js";
 import { Request, Response } from "express";
 import { NoSpecialCharactersGuard } from "./Guards/no-special-char-guard.guard.js";
 import { PdfService } from "./pdf.service.js";
+import { JwtAuthGuard } from "../Auth/jwt/jwt-auth.guard.js";
+import { Roles } from "./Decorators/roles.decorator.js";
+import { RolesGuard } from "../Auth/jwt/roles.guard.js";
 
 @Controller()
 export class ParaController{
@@ -13,6 +16,7 @@ export class ParaController{
     ) {}
 
     //Controller Decorators
+    @UseGuards(JwtAuthGuard)
     @Post('/getCount')
     @UseGuards(NoSpecialCharactersGuard)
     async getCount(
@@ -89,6 +93,8 @@ export class ParaController{
     }
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @Put('flagItem')
   async flagItem(
     @Body() body: {id: string},

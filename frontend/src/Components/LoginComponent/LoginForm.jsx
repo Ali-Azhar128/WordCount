@@ -38,7 +38,15 @@ const LoginForm = () => {
     //   username: 'Guest',
     //  })); 
     navigate('/guestLogin'); 
+
+    
   };
+  const handleAnonymousClick = () => {
+    dispatch(setLoginInfo({ role: 'anonymous',
+      username: 'Anonymous',
+     }));
+    navigate('/');
+  }
 
 
   return (
@@ -102,6 +110,15 @@ const LoginForm = () => {
           <Typography>
             Don't have an account? <Link to="/register">Register</Link>
           </Typography>
+          <Typography>
+            OR
+          </Typography>
+          <Button
+          variant='outlined'
+          onClick={handleAnonymousClick}
+          >
+            Continue using without signup
+          </Button>
           </Box>
         </Box>
       </Paper>

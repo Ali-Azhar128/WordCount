@@ -39,7 +39,6 @@ export class AuthService{
             username: user.username
         }
     }
-
     async guestLogin(username: guestUserSignInDto){
         const user = await this.userService.createGuest(username)
         const seed = uuidv4()
