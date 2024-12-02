@@ -194,9 +194,10 @@ export class ParaService {
         let anonDocs;
 
         const token = extractTokenFromRequest(req);
-        // if (!token) {
-        //   throw new UnauthorizedException('Token not found');
-        // }
+        console.log(token, 'token')
+        if (!token) {
+          throw new UnauthorizedException('Token not found');
+        }
 
         const payload = await this.jwtService.verifyAsync(token, { secret: 'abc123' });
 
