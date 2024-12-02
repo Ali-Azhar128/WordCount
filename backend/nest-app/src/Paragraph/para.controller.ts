@@ -7,6 +7,8 @@ import { PdfService } from "./pdf.service.js";
 import { JwtAuthGuard } from "../Auth/jwt/jwt-auth.guard.js";
 import { Roles } from "./Decorators/roles.decorator.js";
 import { RolesGuard } from "../Auth/jwt/roles.guard.js";
+import { RequestWithUser } from "../Auth/Interface/request-with-user.interface.js";
+import { findCorrectParaGuard } from "./Guards/find-correct-para.guard.js";
 
 @Controller()
 export class ParaController{
@@ -80,7 +82,7 @@ export class ParaController{
     try {
       let docs;
       if (!keyword) {
-        docs = await this.paraService.getDocsWithPagination(Number(page), Number(perPage), userId, req);
+        docs = await this.paraService.getDocsWithPagination(Number(page), Number(perPage), req);
       } else {
         docs = await this.paraService.searchDocsWithPagination(keyword, Number(page), Number(perPage), userId, role);
       }
@@ -135,6 +137,22 @@ export class ParaController{
       res.status(400).json(error)
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('togglePublic')
+  async togglePublic(
+    @Body() Body: {id: string},
+    @Res() res: Response,
+    @Req() req: RequestWithUser
+  ){
+    try {
+      const result = await this.paraService.togglePublic(Body.id, req.user.sub)
+      res.status(200).json(result)
+    } catch (error) {
+      return res.status(400).json(error)
+    }
+  }
+
 
     
 

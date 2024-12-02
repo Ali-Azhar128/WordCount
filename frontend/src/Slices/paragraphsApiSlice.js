@@ -2,26 +2,27 @@ import { apiSlice } from "../store/apiSlice";
 
 const paragraphsApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getAllParagraphs: builder.query({
+      getAllParagraphs: builder.query({
         query: () => "/getAll",
         }),
-        searchParagraphs: builder.query({
+
+      searchParagraphs: builder.query({
         query: (keyword) => `/search?${keyword}`,
         }),
 
-        getPage: builder.query({
+      getPage: builder.query({
             query: (page) => `/getPage?page=${page}`,
         }),
         providesTags: ["Paragraph"],
         
 
-        searchParaWithPageNumber: builder.query({
+      searchParaWithPageNumber: builder.query({
           query: ({keyword, page, userId, role}) => `/searchPage?keyword=${keyword}&page=${page}&perPage=5&userId=${userId}&role=${role}`,
           
       }),
       providesTags: ["Paragraph"],
       
-        addParagraph: builder.mutation({
+      addParagraph: builder.mutation({
         query: (newParagraph) => ({
             url: "/getCount",
             method: "POST",
@@ -31,7 +32,7 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
         providesTags: ["Paragraph"],
         }),
 
-        flagItem: builder.mutation({
+      flagItem: builder.mutation({
           query: (id) => ({
               url: `/flagItem`,
               method: "PUT",
@@ -50,11 +51,24 @@ const paragraphsApiSlice = apiSlice.injectEndpoints({
         invalidatesTags: ["Paragraph"],
         }),
 
-        findByID: builder.query({
+      findByID: builder.query({
           query: (id) => `/findById?id=${id}`,
         }),
+
+        togglePublic: builder.mutation({
+          query: (id) => ({
+              url: `/togglePublic`,
+              method: "PUT",
+              body: {id},
+              credentials: 'include'
+          }),
+          invalidatesTags: ["Paragraph"],
       }),
+      }),
+
+      
+
       overrideExisting: false,
     });
 
-export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation, useFlagItemMutation, useDeleteItemMutation, useFindByIDQuery } = paragraphsApiSlice;
+export const { useGetAllParagraphsQuery, useSearchParagraphsQuery, useGetPageQuery, useSearchParaWithPageNumberQuery, useAddParagraphMutation, useFlagItemMutation, useDeleteItemMutation, useFindByIDQuery, useTogglePublicMutation } = paragraphsApiSlice;

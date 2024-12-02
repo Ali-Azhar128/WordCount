@@ -12,11 +12,13 @@ import { Notification, NotificationSchema } from "./Notifications/notification.s
 import { AuthModule } from "../Auth/auth.module.js";
 import { APP_GUARD } from "@nestjs/core";
 import { RolesGuard } from "../Auth/auth.guard.js";
+import { User, UserSchema } from "../users/users.schema.js";
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: Paragraph.name, schema: ParaSchema }]),
         MongooseModule.forFeature([{ name: Notification.name, schema: NotificationSchema }]),
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
         AuthModule
     ],
     controllers: [ParaController],

@@ -14,6 +14,7 @@ import { NotificationGateway } from "./notification.gateway.js";
 import { Request } from "express";
 import { extractTokenFromRequest } from "./Utils/auth.utils.js";
 import { JwtService } from '@nestjs/jwt';
+import { User, UserDocument } from "../users/users.schema.js";
 
 interface Token {
     value: string,
@@ -28,6 +29,7 @@ export class ParaService {
 
     constructor
     (@InjectModel(Paragraph.name) private paraModel: Model<ParaDocument>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
      private readonly paraDow: ParaDOW,
      private readonly notificationGateway: NotificationGateway,
      private readonly jwtService: JwtService
@@ -125,6 +127,7 @@ export class ParaService {
 
     async getCount(createParaDto: CreateParaDto): Promise<{ count: number, id: string }> {
         const { paragraph, ip, user, type } = createParaDto;
+        const {username} = await this.userModel.findById(user).exec();
         console.log(type, 'type')
         const preprocessedParagraph = contractions.expand(paragraph);
         let tokens: string[] = [];
@@ -163,7 +166,7 @@ export class ParaService {
         console.log(tokens);
         let count = tokens.length;
 
-        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false, createdBy: user, type: type, isNotified: false });
+        const savedPara = await this.paraDow.create({ paragraph, ip, count, language, isFlagged: false, createdBy: user, type: type, isNotified: false, username: username });
         await savedPara.save();
         return { count, id: savedPara.id };
     }
@@ -186,7 +189,7 @@ export class ParaService {
 
     }
 
-    async getDocsWithPagination(page: number = 1, perPage: number = 5, userId: string, req: Request): Promise<any> {
+    async getDocsWithPagination(page: number = 1, perPage: number = 5, req: Request): Promise<any> {
         let totalDocs;
         let docs
         let totalPages
@@ -201,8 +204,8 @@ export class ParaService {
 
         const payload = await this.jwtService.verifyAsync(token, { secret: 'abc123' });
 
+        console.log(payload.sub, 'payloade')
         const { role } = payload;
-        console.log(role, 'role')
 
         if(role === 'admin') {
             totalDocs = await this.paraModel.countDocuments().exec();
@@ -219,9 +222,11 @@ export class ParaService {
                 return {docs, totalPages}
             }
         }else if(role === 'guest'){
-            totalDocs = await this.paraModel.countDocuments({type: 'guest'}).exec();
+            totalDocs = await this.paraModel.countDocuments({
+                $or: [{type: 'guest'}, {isPublic: true}]
+            }).exec();
             docs = await this.paraModel
-          .find({type: 'guest'})
+          .find({ $or: [{type: 'guest'}, {isPublic: true}]})
           .skip((page - 1) * perPage)
           .limit(perPage)
           .exec();
@@ -229,10 +234,12 @@ export class ParaService {
           return {docs, totalPages} 
         }
         else{
-            totalDocs = await this.paraModel.countDocuments({createdBy: userId}).exec();
+            totalDocs = await this.paraModel.countDocuments({
+                $or: [{createdBy: payload.sub}, {isPublic: true}]
+            }).exec();
             console.log(role, 'role')
             docs = await this.paraModel
-          .find({createdBy: userId})
+          .find({$or: [{createdBy: payload.sub}, {isPublic: true}]})
           .skip((page - 1) * perPage)
           .limit(perPage)
           anonDocs = await this.paraModel.find({type: 'guest'}).exec();
@@ -290,5 +297,19 @@ export class ParaService {
 
     async findById(id: string): Promise<ParaDocument> {
         return this.paraModel.findById(id).exec();
+    }
+
+    async togglePublic(id: string, userId: string): Promise<string> {
+        
+        const doc = await this.paraDow.find(id);
+        if(doc.createdBy !== userId){
+            throw new UnauthorizedException('You are not authorized to update this document');
+        }
+        if (!doc) {
+            throw new Error('Document not found');
+        }
+        doc.isPublic = !doc.isPublic;
+        doc.save()
+        return 'Document updated';
     }
 }

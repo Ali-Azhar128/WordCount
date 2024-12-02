@@ -17,7 +17,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import SortIcon from '@mui/icons-material/Sort';
 import { Avatar, Button, Chip, Pagination, Stack, TextField, Tooltip } from '@mui/material';
-import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation, useDeleteItemMutation } from '../Slices/paragraphsApiSlice';
+import { useGetPageQuery, useSearchParaWithPageNumberQuery, useFlagItemMutation, useDeleteItemMutation, useTogglePublicMutation } from '../Slices/paragraphsApiSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAllParas, setFlaggedItem, setPageNumber, setParagraphId, setUserIdToSendNotificationTo, updateParagraphNotification } from '../Slices/paragraphsSlice';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -28,6 +28,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 
 const drawerWidth = 240;
@@ -128,6 +129,7 @@ const socket = io('http://localhost:3000')
   });
   const [flagItem, {isLoading: flagItemLoading, isError}] = useFlagItemMutation();
   const [deleteItem, {isLoading: deleteLoading, isError: deleteError}] = useDeleteItemMutation();
+  const [toggleItem, {isLoading: toggleLoading, isError: toggleError}] = useTogglePublicMutation();
 
  // router-dom
  const navigate = useNavigate();
@@ -180,6 +182,21 @@ const socket = io('http://localhost:3000')
       toast.error(error);
     }
   }
+
+  const togglePublic = async (e, id) => {
+    e.stopPropagation()
+    try {
+      const res = await toggleItem(id).unwrap();
+      console.log(res, 'res of toggle')
+      toast.success(res)
+      refetchPage()
+      refetch()
+    } catch (error) {
+      console.error(error)
+      toast.error(error);
+    }
+  }
+
 
   const handleDelete = async (e, id) => {
     e.stopPropagation()
@@ -410,15 +427,20 @@ useEffect(() => {
                               </div>
                             {
                               user && ( 
-                                user.role === 'admin' && (
+                                user.role === 'admin' ? (
                                   <div className='flex'>
                                     <FlagIcon onClick={(e) => toggleFlagItem(e, text.id, text.createdBy, text.isFlagged)} sx={{ color: text.isFlagged ? 'white' : 'black' }} />
                                     <DeleteIcon onClick={(e) => handleDelete(e, text.id)} sx={{ color: 'black' }} />
+                                     
 
                                   </div>
-                                )
+                                ):
+                                (<MoreVertIcon onClick={(e) => togglePublic(e, text.id)}/>)
+                                
                               )
+
                             }
+                            
                             </div>
                             <div className='flex space-x-1 justify-end'>
                               <Chip

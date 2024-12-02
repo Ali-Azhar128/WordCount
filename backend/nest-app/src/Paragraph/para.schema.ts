@@ -34,6 +34,12 @@ export class Paragraph{
 
   @Prop({ default: false })
   isNotified: boolean
+
+  @Prop()
+  username: string
+
+  @Prop({ default: false })
+  isPublic: boolean
 }
 
 export const ParaSchema = SchemaFactory.createForClass(Paragraph)

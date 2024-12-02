@@ -7,7 +7,8 @@ import {
   } from '@nestjs/common';
   import { JwtService } from '@nestjs/jwt';
   import { Request } from 'express';
-import { RequestWithUser } from './request-with-user.interface';
+
+  import { RequestWithUser } from '../Interface/request-with-user.interface';
   
   @Injectable()
   export class JwtAuthGuard implements CanActivate {
@@ -30,20 +31,19 @@ import { RequestWithUser } from './request-with-user.interface';
         // 💡 We're assigning the payload to the request object here
         // so that we can access it in our route handlers
         request['user'] = payload;
+        console.log(request.user.sub, 'sub')
       } catch {
         throw new UnauthorizedException();
       }
       return true;
     }
   
-    private extractTokenFromHeader(request: Request): string | undefined {
-      // Check for token in Authorization header
+    extractTokenFromHeader(request: Request): string | undefined {
       const [type, token] = request.headers.authorization?.split(' ') ?? [];
       console.log(request.cookies, 'cookies')
         if(type === 'Bearer' && token){
           return token
         }
-        // Check for token in cookies
       return request.cookies?.jwt
     }
   }
