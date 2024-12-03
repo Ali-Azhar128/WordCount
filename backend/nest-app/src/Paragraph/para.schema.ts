@@ -1,11 +1,11 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
-export type ParaDocument = Paragraph & Document
+export type ParaDocument = Paragraph & Document;
 
 @Schema({ timestamps: true })
-export class Paragraph{
-    @Prop({ required: true })
+export class Paragraph {
+  @Prop({ required: true })
   paragraph: string;
 
   @Prop({ required: true })
@@ -27,19 +27,22 @@ export class Paragraph{
   isFlagged: boolean;
 
   @Prop()
-  createdBy: string
+  createdBy: string;
 
   @Prop()
-  type: string
+  type: string;
 
   @Prop({ default: false })
-  isNotified: boolean
+  isNotified: boolean;
 
   @Prop()
-  username: string
+  username: string;
 
   @Prop({ default: false })
-  isPublic: boolean
+  isPublic: boolean;
+
+  @Prop()
+  role: string;
 }
 
-export const ParaSchema = SchemaFactory.createForClass(Paragraph)
+export const ParaSchema = SchemaFactory.createForClass(Paragraph);

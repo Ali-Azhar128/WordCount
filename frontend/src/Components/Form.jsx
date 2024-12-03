@@ -69,8 +69,6 @@ const Form = () => {
       const result = await addParagraph({
         paragraph: text,
         ip,
-        user: user.sub,
-        type: user.role,
       }).unwrap();
       setCount(result.count);
       setUrl(`http://localhost:3000${result.pdfDownloadLink}`);
@@ -205,7 +203,7 @@ const Form = () => {
             Enter Your Paragraph
           </label>
           <textarea
-            className="p-1 bg-white w-[90%] border-2 rounded-md"
+            className="p-1 bg-white w-[90%] border-2 rounded-md resize-none h-32"
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={4}

@@ -1,21 +1,21 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
 
 export const paragraphSlice = createSlice({
-  name: 'paragraphs',
+  name: "paragraphs",
   initialState: {
     paragraphs: [],
     pageNumber: 1,
-    userId: '',
+    userId: "",
     flaggedItem: false,
-    paragraphId: ''
+    paragraphId: "",
   },
   reducers: {
     setAllParas: (state, action) => {
       state.paragraphs = [];
-      
+
       // Extract para property from each object and add to state
-      console.log(action.payload.docs, 'action.payload')
-      action.payload.map(item => {
+      console.log(action.payload.docs, "action.payload");
+      action.payload.map((item) => {
         const newItem = {
           para: item.paragraph,
           createdAt: item.createdAt,
@@ -28,12 +28,13 @@ export const paragraphSlice = createSlice({
           isNotified: item.isNotified,
           username: item.username,
           isPublic: item.isPublic,
-        }
-        console.log(newItem, 'newItem')
+          type: item.type,
+        };
+        console.log(newItem, "newItem");
         state.paragraphs.push(newItem);
       });
-      
-      console.log(state.paragraphs, 'state.paragraphs')
+
+      console.log(state.paragraphs, "state.paragraphs");
     },
 
     setPageNumber: (state, action) => {
@@ -41,31 +42,38 @@ export const paragraphSlice = createSlice({
     },
 
     setUserIdToSendNotificationTo: (state, action) => {
-      state.userId = action.payload.createdBy
-      state.paragraphId = action.payload.id
-      console.log(action.payload, 'payload of user id')
+      state.userId = action.payload.createdBy;
+      state.paragraphId = action.payload.id;
+      console.log(action.payload, "payload of user id");
     },
 
     setFlaggedItem: (state, action) => {
-      state.flaggedItem = action.payload
+      state.flaggedItem = action.payload;
     },
 
     setParagraphId: (state, action) => {
-      console.log(action.payload, 'payload')
-      state.paragraphId = action.payload
+      console.log(action.payload, "payload");
+      state.paragraphId = action.payload;
     },
 
     updateParagraphNotification: (state, action) => {
       const { id, isNotified } = action.payload;
-      const paragraph = state.paragraphs.find(p => p.id === id);
+      const paragraph = state.paragraphs.find((p) => p.id === id);
       if (paragraph) {
         paragraph.isNotified = isNotified;
       }
-    }
-  }
-})
+    },
+  },
+});
 
 // Action creators are generated for each case reducer function
-export const { setAllParas, setPageNumber, setUserIdToSendNotificationTo, setFlaggedItem,setParagraphId, updateParagraphNotification } = paragraphSlice.actions
+export const {
+  setAllParas,
+  setPageNumber,
+  setUserIdToSendNotificationTo,
+  setFlaggedItem,
+  setParagraphId,
+  updateParagraphNotification,
+} = paragraphSlice.actions;
 
-export default paragraphSlice.reducer
+export default paragraphSlice.reducer;

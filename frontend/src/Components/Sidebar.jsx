@@ -53,6 +53,8 @@ import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PublicIcon from "@mui/icons-material/Public";
+import PersonIcon from "@mui/icons-material/Person";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 const drawerWidth = 240;
 
@@ -461,7 +463,7 @@ export default function PersistentDrawerLeft({
                           }}
                         >
                           {text.isPublic && (
-                            <Tooltip title="Public Item">
+                            <Tooltip title="Public Document">
                               <PublicIcon
                                 sx={{
                                   fontSize: "14px",
@@ -505,56 +507,61 @@ export default function PersistentDrawerLeft({
                                   />
                                 </div>
                               ) : (
-                                <div>
-                                  <IconButton
-                                    aria-label="more"
-                                    id="long-button"
-                                    aria-controls={
-                                      open ? "long-menu" : undefined
-                                    }
-                                    aria-expanded={open ? "true" : undefined}
-                                    aria-haspopup="true"
-                                    onClick={(event) =>
-                                      handleClick(event, text.id)
-                                    }
-                                  >
-                                    <MoreVertIcon />
-                                  </IconButton>
-                                  <Menu
-                                    id="long-menu"
-                                    MenuListProps={{
-                                      "aria-labelledby": "long-button",
-                                    }}
-                                    anchorEl={anchorEl}
-                                    open={openMenu}
-                                    onClose={handleClose}
-                                    slotProps={{
-                                      paper: {
-                                        style: {
-                                          maxHeight: ITEM_HEIGHT * 4.5,
-                                          width: "20ch",
-                                        },
-                                      },
-                                    }}
-                                  >
-                                    <MenuItem
-                                      onClick={togglePublic}
-                                      key={selectedId}
+                                text.type === "user" && (
+                                  <div>
+                                    <IconButton
+                                      aria-label="more"
+                                      id="long-button"
+                                      aria-controls={
+                                        open ? "long-menu" : undefined
+                                      }
+                                      aria-expanded={open ? "true" : undefined}
+                                      aria-haspopup="true"
+                                      onClick={(event) =>
+                                        handleClick(event, text.id)
+                                      }
                                     >
-                                      {para.find(
-                                        (item) => item.id === selectedId
-                                      )?.isPublic
-                                        ? "Make Private"
-                                        : "Make Public"}
-                                    </MenuItem>
-                                  </Menu>
-                                </div>
+                                      <MoreVertIcon />
+                                    </IconButton>
+                                    <Menu
+                                      id="long-menu"
+                                      MenuListProps={{
+                                        "aria-labelledby": "long-button",
+                                      }}
+                                      anchorEl={anchorEl}
+                                      open={openMenu}
+                                      onClose={handleClose}
+                                      slotProps={{
+                                        paper: {
+                                          style: {
+                                            maxHeight: ITEM_HEIGHT * 4.5,
+                                            width: "20ch",
+                                          },
+                                        },
+                                      }}
+                                    >
+                                      <MenuItem
+                                        onClick={togglePublic}
+                                        key={selectedId}
+                                      >
+                                        {para.find(
+                                          (item) => item.id === selectedId
+                                        )?.isPublic
+                                          ? "Make Private"
+                                          : "Make Public"}
+                                      </MenuItem>
+                                    </Menu>
+                                  </div>
+                                )
                               ))}
                           </div>
                           <div className="flex space-x-1 justify-end">
                             <Chip
                               icon={<LanguageIcon />}
                               sx={{
+                                "& .MuiChip-icon": {
+                                  color: "black",
+                                },
                                 marginTop: "5px",
                                 alignSelf: "flex-end",
                                 variant: "outlined",
@@ -564,7 +571,17 @@ export default function PersistentDrawerLeft({
                               size="small"
                             />
                             <Chip
+                              icon={
+                                <CalendarMonthIcon
+                                  sx={{
+                                    color: "black",
+                                  }}
+                                />
+                              }
                               sx={{
+                                "& .MuiChip-icon": {
+                                  color: "black",
+                                },
                                 marginTop: "5px",
                                 alignSelf: "flex-end",
                                 backgroundColor: "#E0E0E0",
@@ -574,8 +591,17 @@ export default function PersistentDrawerLeft({
                             />
                           </div>
                           <Chip
-                            icon={<LanguageIcon />}
+                            icon={
+                              <PersonIcon
+                                sx={{
+                                  color: "white",
+                                }}
+                              />
+                            }
                             sx={{
+                              "& .MuiChip-icon": {
+                                color: "white",
+                              },
                               marginTop: "5px",
                               alignSelf: "flex-end",
                               variant: "outlined",

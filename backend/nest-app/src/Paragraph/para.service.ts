@@ -23,6 +23,7 @@ import {
 import { splitMixedText } from './Utils/text-utils.js';
 import { containsSpecialCharEng } from './Utils/token-utils.js';
 import { specialCharacters } from './Utils/special-characters.js';
+import { RequestWithUser } from '../Auth/Interface/request-with-user.interface.js';
 
 interface Token {
   value: string;
@@ -70,10 +71,12 @@ export class ParaService {
 
   async getCount(
     createParaDto: CreateParaDto,
+    req: RequestWithUser,
   ): Promise<{ count: number; id: string }> {
-    const { paragraph, ip, user, type } = createParaDto;
-    const { username } = await this.userModel.findById(user).exec();
-    console.log(type, 'type');
+    const { user } = req;
+    const { paragraph, ip } = createParaDto;
+    const { username } = await this.userModel.findById(user.sub).exec();
+
     const preprocessedParagraph = contractions.expand(paragraph);
     let tokens: string[] = [];
 
@@ -116,8 +119,8 @@ export class ParaService {
       count,
       language,
       isFlagged: false,
-      createdBy: user,
-      type: type,
+      createdBy: user.sub,
+      type: user.role,
       isNotified: false,
       username: username,
     });

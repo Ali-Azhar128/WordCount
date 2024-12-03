@@ -32,11 +32,11 @@ export class ParaController {
   @UseGuards(NoSpecialCharactersGuard)
   async getCount(
     @Body() createparaDto: CreateParaDto,
-    @Req() req: Request,
+    @Req() req: RequestWithUser,
     @Res() res: Response,
   ): Promise<any> {
     try {
-      const { count, id } = await this.paraService.getCount(createparaDto);
+      const { count, id } = await this.paraService.getCount(createparaDto, req);
       const filename = await this.pdfService.generatePDF(
         id,
         createparaDto.paragraph,
