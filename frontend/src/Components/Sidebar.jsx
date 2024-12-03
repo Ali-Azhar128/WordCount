@@ -52,6 +52,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import PublicIcon from "@mui/icons-material/Public";
 
 const drawerWidth = 240;
 
@@ -203,8 +204,8 @@ export default function PersistentDrawerLeft({
       refetch();
       console.log("here");
     } catch (error) {
-      console.error(error);
-      toast.error(error);
+      console.error(error?.data?.message, "error");
+      toast.error(error?.data?.message);
     }
   };
 
@@ -459,6 +460,15 @@ export default function PersistentDrawerLeft({
                             justifyContent: "space-between",
                           }}
                         >
+                          {text.isPublic && (
+                            <Tooltip title="Public Item">
+                              <PublicIcon
+                                sx={{
+                                  fontSize: "14px",
+                                }}
+                              />
+                            </Tooltip>
+                          )}
                           <div className="flex justify-between items-center">
                             <div className="flex space-x-1">
                               {text.isFlagged && (
@@ -470,7 +480,7 @@ export default function PersistentDrawerLeft({
                                 </Tooltip>
                               )}
                               <span className="text-sm font-semibold">
-                                {truncateText(text.para, 6)}
+                                {truncateText(text.para, 3)}
                               </span>
                             </div>
                             {user &&

@@ -112,6 +112,8 @@ export class ParaController {
     }
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @Delete('deleteItem')
   async deleteItem(
     @Body() body: { id: string },

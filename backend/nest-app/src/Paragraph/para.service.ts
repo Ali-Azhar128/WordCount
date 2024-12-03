@@ -15,6 +15,14 @@ import { Request } from 'express';
 import { extractTokenFromRequest } from './Utils/auth.utils.js';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserDocument } from '../users/users.schema.js';
+import {
+  getAdminDocs,
+  getGuestDocs,
+  getUserDocs,
+} from './Utils/getDocs.utils.js';
+import { splitMixedText } from './Utils/text-utils.js';
+import { containsSpecialCharEng } from './Utils/token-utils.js';
+import { specialCharacters } from './Utils/special-characters.js';
 
 interface Token {
   value: string;
@@ -25,7 +33,6 @@ interface Token {
 export class ParaService {
   private tokenizer: winkTokenizer;
   private segmenter: any;
-  private specialCharacters: string[];
 
   constructor(
     @InjectModel(Paragraph.name) private paraModel: Model<ParaDocument>,
@@ -36,44 +43,6 @@ export class ParaService {
   ) {
     this.tokenizer = new winkTokenizer();
     this.segmenter = new TinySegmenter();
-    this.specialCharacters = [
-      '\n',
-      '!',
-      '？',
-      ',',
-      '@',
-      '#',
-      '$',
-      '%',
-      '^',
-      '&',
-      '*',
-      '(',
-      ')',
-      '-',
-      '_',
-      '=',
-      '+',
-      '[',
-      ']',
-      '{',
-      '}',
-      '\\',
-      '|',
-      ';',
-      ':',
-      "'",
-      '"',
-      ',',
-      '.',
-      '<',
-      '>',
-      '/',
-      '?',
-      '`',
-      '~',
-      '，',
-    ];
   }
 
   containsSpecialChar = (arr: string[]): string[] => {
@@ -91,95 +60,13 @@ export class ParaService {
         continue;
       }
 
-      if (!this.specialCharacters.includes(arr[i])) {
+      if (!specialCharacters.includes(arr[i])) {
         result.push(arr[i]);
       }
       i++;
     }
     return result;
   };
-
-  containsSpecialCharEng = (arr: Token[]): Token[] => {
-    let i = 0;
-    const result: Token[] = [];
-
-    while (i < arr.length) {
-      if (
-        arr[i].value === '[' &&
-        i + 2 < arr.length &&
-        arr[i + 2].value === ']' &&
-        /^\d+$/.test(arr[i + 1].value)
-      ) {
-        i += 3;
-        continue;
-      }
-
-      if (
-        arr[i].tag !== 'punctuation' &&
-        !this.specialCharacters.includes(arr[i].value)
-      ) {
-        result.push(arr[i]);
-      }
-      i++;
-    }
-    return result;
-  };
-
-  private splitMixedText(text: string): {
-    chinese: string[];
-    japanese: string[];
-    english: string[];
-  } {
-    const segments: {
-      chinese: string[];
-      japanese: string[];
-      english: string[];
-    } = {
-      chinese: [],
-      japanese: [],
-      english: [],
-    };
-
-    let currentSegment = '';
-    let currentType = 'english';
-
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-      const isChineseChar = /[\u4e00-\u9fa5]/.test(char);
-      const isJapaneseChar = /[\u3040-\u30ff\u31f0-\u31ff]/.test(char);
-
-      // Determine the type of the current character
-      let charType = 'english';
-      if (isChineseChar) charType = 'chinese';
-      else if (isJapaneseChar) charType = 'japanese';
-
-      // If type changes or we hit a space, process the current segment
-      if (charType !== currentType || char === ' ') {
-        if (currentSegment) {
-          if (currentType === 'chinese') segments.chinese.push(currentSegment);
-          else if (currentType === 'japanese')
-            segments.japanese.push(currentSegment);
-          else if (currentSegment.trim())
-            segments.english.push(currentSegment.trim());
-        }
-        currentSegment = '';
-        currentType = charType;
-      }
-
-      currentSegment += char;
-    }
-
-    // Process the last segment
-    if (currentSegment) {
-      if (currentType === 'chinese') segments.chinese.push(currentSegment);
-      else if (currentType === 'japanese')
-        segments.japanese.push(currentSegment);
-      else if (currentSegment.trim())
-        segments.english.push(currentSegment.trim());
-    }
-
-    return segments;
-  }
 
   async getCount(
     createParaDto: CreateParaDto,
@@ -197,7 +84,7 @@ export class ParaService {
     console.log(`Detected language: ${language}`);
 
     // Split the text into language segments
-    const segments = this.splitMixedText(preprocessedParagraph);
+    const segments = splitMixedText(preprocessedParagraph);
 
     // Process Chinese segments
     for (const segment of segments.chinese) {
@@ -214,7 +101,7 @@ export class ParaService {
     // Process English segments
     for (const segment of segments.english) {
       const tokenized: Token[] = this.tokenizer.tokenize(segment);
-      const englishTokens = this.containsSpecialCharEng(tokenized)
+      const englishTokens = containsSpecialCharEng(tokenized, specialCharacters)
         .filter((token) => token.tag === 'word' || token.tag === 'number')
         .map((token) => token.value);
       tokens = tokens.concat(englishTokens);
@@ -250,72 +137,21 @@ export class ParaService {
     perPage: number = 5,
     req: Request,
   ): Promise<any> {
-    let totalDocs;
-    let docs;
-    let totalPages;
-    let allDocs;
-    let anonDocs;
-
     const token = extractTokenFromRequest(req);
-    console.log(token, 'token');
     if (!token) {
       throw new UnauthorizedException('Token not found');
     }
-
     const payload = await this.jwtService.verifyAsync(token, {
-      secret: 'abc123',
+      secret: process.env.JWT_SECRET || 'abc123',
     });
-
-    console.log(payload.sub, 'payloade');
     const { role } = payload;
 
     if (role === 'admin') {
-      totalDocs = await this.paraModel.countDocuments().exec();
-      docs = await this.paraModel
-        .find()
-        .skip((page - 1) * perPage)
-        .limit(perPage)
-        .exec();
-      allDocs = docs;
-      totalPages = Math.ceil(totalDocs / perPage);
-      if (page === Math.ceil(totalDocs / perPage)) {
-        return { docs: allDocs, totalPages: totalPages };
-      } else {
-        return { docs, totalPages };
-      }
+      return getAdminDocs(this.paraModel, page, perPage);
     } else if (role === 'user') {
-      totalDocs = await this.paraModel
-        .countDocuments({
-          $or: [{ createdBy: payload.sub }, { isPublic: true }],
-        })
-        .exec();
-      console.log(role, 'role');
-      docs = await this.paraModel
-        .find({ $or: [{ createdBy: payload.sub }, { isPublic: true }] })
-        .skip((page - 1) * perPage)
-        .limit(perPage);
-      anonDocs = await this.paraModel.find({ type: 'guest' }).exec();
-      allDocs = [...docs, ...anonDocs];
-
-      totalPages = Math.ceil((totalDocs + anonDocs.length) / perPage);
-      if (page === Math.ceil((totalDocs + anonDocs.length) / perPage)) {
-        return { docs: allDocs, totalPages: totalPages };
-      } else {
-        return { docs, totalPages };
-      }
+      return getUserDocs(this.paraModel, page, perPage, payload.sub);
     } else {
-      totalDocs = await this.paraModel
-        .countDocuments({
-          $or: [{ type: 'guest' }, { isPublic: true }],
-        })
-        .exec();
-      docs = await this.paraModel
-        .find({ $or: [{ type: 'guest' }, { isPublic: true }] })
-        .skip((page - 1) * perPage)
-        .limit(perPage)
-        .exec();
-      totalPages = Math.ceil(totalDocs / perPage);
-      return { docs, totalPages };
+      return getGuestDocs(this.paraModel, page, perPage);
     }
   }
 
@@ -370,7 +206,11 @@ export class ParaService {
       message: 'Your paragraph has been flagged.',
       id: doc._id as string,
     });
-    return 'Document flagged';
+    if (doc.isFlagged) {
+      return 'Document flagged';
+    } else {
+      return 'Document unflagged';
+    }
   }
 
   async deleteItem(id: string): Promise<any> {
