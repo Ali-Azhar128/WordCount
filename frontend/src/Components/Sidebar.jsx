@@ -161,12 +161,6 @@ export default function PersistentDrawerLeft({
   const userId = useSelector((state) => state.paragraphs.userId);
 
   const {
-    data,
-    error,
-    isLoading,
-    refetch: refetchPage,
-  } = useGetPageQuery(pageNumber);
-  const {
     data: searchResultsWithPage,
     isLoading: isLoadingWithPage,
     refetch,
@@ -206,7 +200,6 @@ export default function PersistentDrawerLeft({
       dispatch(setParagraphId(id));
       console.log(flagged, "text.isFlagged");
       toast.success(res);
-      refetchPage();
       refetch();
       console.log("here");
     } catch (error) {
@@ -217,11 +210,9 @@ export default function PersistentDrawerLeft({
 
   const togglePublic = async () => {
     console.log("clicked");
-    // e.stopPropagation();
     try {
       const res = await toggleItem(selectedId).unwrap();
       toast.success(res);
-      refetchPage();
       refetch();
       setAnchorEl(null);
     } catch (error) {
@@ -242,9 +233,7 @@ export default function PersistentDrawerLeft({
   const handleDelete = async (e, id) => {
     e.stopPropagation();
     try {
-      console.log(data, "data before delete");
       const res = await deleteItem(id).unwrap();
-      console.log(data, "data after delete");
       toast.success(res);
       const updatedData = await refetch().unwrap();
 
@@ -252,7 +241,6 @@ export default function PersistentDrawerLeft({
         dispatch(setPageNumber(pageNumber - 1));
       }
       setRefetchData(!refetchData);
-      refetchPage();
       refetch();
     } catch (error) {
       console.error(error);
@@ -292,17 +280,13 @@ export default function PersistentDrawerLeft({
       dispatch(setAllParas(searchResultsWithPage.docs));
       console.log("data refetched");
     }
-  }, [data, dispatch, refetchData, searchResultsWithPage]);
+  }, [dispatch, refetchData, searchResultsWithPage]);
 
   useEffect(() => {
     setIsAdmin(user?.role === "admin");
   }, [user]);
 
   useEffect(() => {
-    // socket.on('notificationReceived', (data) => {
-    //   console.log('Notification received:', data);
-    //   dispatch(updateParagraphNotification({ id: data.id, isNotified: true }));
-    // });
     socket.on("notificationStatusUpdate", (data) => {
       console.log("Notification status update:", data);
       dispatch(
@@ -320,7 +304,7 @@ export default function PersistentDrawerLeft({
     };
   }, [dispatch, searchResultsWithPage]);
 
-  return isLoading && isLoadingWithPage ? (
+  return isLoadingWithPage ? (
     <div>Loading...</div>
   ) : (
     <div className="relative">
@@ -433,6 +417,9 @@ export default function PersistentDrawerLeft({
           </DrawerHeader>
           <div className="px-2 py-2">
             <TextField
+              sx={{
+                fontSize: "0.875rem",
+              }}
               fullWidth
               size="small"
               label="Search Documents"
@@ -441,14 +428,7 @@ export default function PersistentDrawerLeft({
                 setSearch(keyword);
                 if (keyword && !isLoadingWithPage) {
                   dispatch(setAllParas(searchResultsWithPage.docs));
-                } else {
-                  // getDocs();
                 }
-              }}
-              InputProps={{
-                sx: {
-                  fontSize: "0.875rem",
-                },
               }}
             />
           </div>
