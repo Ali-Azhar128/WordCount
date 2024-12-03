@@ -26,6 +26,7 @@ export const paragraphSlice = createSlice({
           isFlagged: item.isFlagged,
           createdBy: item.createdBy,
           isNotified: item.isNotified,
+          username: item.username,
           isPublic: item.isPublic,
         }
         console.log(newItem, 'newItem')

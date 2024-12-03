@@ -49,6 +49,15 @@ export class AuthService{
         }
     }
 
+    async anonymousSignin(){
+        const seed = uuidv4()
+        const payload = {sub: 'anonymous', role: 'anonymous', seed}
+        return {
+            access_token: await this.jwtService.signAsync(payload),
+            username: 'anonymous'
+        }
+    }
+
 
     
 }

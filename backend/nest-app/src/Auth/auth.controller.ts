@@ -80,5 +80,24 @@ export class AuthController{
         }
 
     }
+
+    @Post('anonymousLogin')
+    async anonymousLogin(
+        @Res() res: Response
+    ){
+        try {
+            const payload = await this.authService.anonymousSignin()
+            res.cookie('jwt', payload.access_token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 3600000, 
+              });
+            const access_token = payload.access_token
+            const user = await this.authService.getPayloadFromToken(access_token)
+            res.status(200).json({access_token, user})
+        } catch (error) {
+            return res.status(400).json(error.message)
+        }
+    }
     
 }

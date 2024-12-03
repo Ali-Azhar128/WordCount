@@ -221,7 +221,27 @@ export class ParaService {
             }else{
                 return {docs, totalPages}
             }
-        }else if(role === 'guest'){
+        }else if(role === 'user'){
+            
+          totalDocs = await this.paraModel.countDocuments({
+            $or: [{createdBy: payload.sub}, {isPublic: true}]
+        }).exec();
+        console.log(role, 'role')
+        docs = await this.paraModel
+      .find({$or: [{createdBy: payload.sub}, {isPublic: true}]})
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      anonDocs = await this.paraModel.find({type: 'guest'}).exec();
+        allDocs = [...docs, ...anonDocs];
+       
+        totalPages = Math.ceil((totalDocs + anonDocs.length) / perPage);
+        if(page === Math.ceil((totalDocs + (anonDocs.length)) / perPage)){
+            return {docs: allDocs, totalPages: totalPages};
+        }else{
+            return {docs, totalPages}
+        }
+        }
+        else{
             totalDocs = await this.paraModel.countDocuments({
                 $or: [{type: 'guest'}, {isPublic: true}]
             }).exec();
@@ -232,25 +252,7 @@ export class ParaService {
           .exec();
           totalPages = Math.ceil(totalDocs / perPage);
           return {docs, totalPages} 
-        }
-        else{
-            totalDocs = await this.paraModel.countDocuments({
-                $or: [{createdBy: payload.sub}, {isPublic: true}]
-            }).exec();
-            console.log(role, 'role')
-            docs = await this.paraModel
-          .find({$or: [{createdBy: payload.sub}, {isPublic: true}]})
-          .skip((page - 1) * perPage)
-          .limit(perPage)
-          anonDocs = await this.paraModel.find({type: 'guest'}).exec();
-            allDocs = [...docs, ...anonDocs];
-           
-            totalPages = Math.ceil((totalDocs + anonDocs.length) / perPage);
-            if(page === Math.ceil((totalDocs + (anonDocs.length)) / perPage)){
-                return {docs: allDocs, totalPages: totalPages};
-            }else{
-                return {docs, totalPages}
-            }
+
         }
       }
 

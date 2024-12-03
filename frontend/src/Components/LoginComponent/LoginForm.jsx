@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import TextField from '@mui/material/TextField'
 import { Button, Container, Typography, Box, Paper, Avatar, Divider } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { useLoginMutation } from '../../Slices/usersApiSlices'
+import { useAnonymousLoginMutation, useLoginMutation } from '../../Slices/usersApiSlices'
 import { toast } from 'react-toastify'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
@@ -17,6 +17,7 @@ const LoginForm = () => {
   const navigate = useNavigate()
   // Redux
   const [login, {isLoading, isError}] = useLoginMutation()
+  const [anonLogin, {isLoading: anonLoginLoading, isError: anonLoginError}] = useAnonymousLoginMutation()
   const dispatch = useDispatch()
 
   const handleSubmit = async (e) => {
@@ -41,11 +42,12 @@ const LoginForm = () => {
 
     
   };
-  const handleAnonymousClick = () => {
+  const handleAnonymousClick = async () => {
     dispatch(setLoginInfo({ role: 'anonymous',
       username: 'Anonymous',
      }));
-    navigate('/');
+     await anonLogin().unwrap()
+      navigate('/');
   }
 
 

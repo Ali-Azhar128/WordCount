@@ -39,8 +39,16 @@ const usersSlice = apiSlice.injectEndpoints({
         credentials: 'include'
       }),
     }),
+    anonymousLogin: builder.mutation({
+      query: () => ({
+        url: "/auth/anonymousLogin",
+        method: "POST",
+        credentials: 'include'
+      }),
+
+    })
   }),
 });
 
-export const { useLoginMutation, useUserLoginMutation, useGuestLoginMutation } =
+export const { useLoginMutation, useUserLoginMutation, useGuestLoginMutation, useAnonymousLoginMutation } =
   usersSlice;

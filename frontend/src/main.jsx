@@ -18,23 +18,30 @@ import GuestSigninComponent from './Components/LoginComponent/GuestSigninCompone
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/login"/>,
-  },
-  {
-    path: '/login',
-    element: <LoginPage/>
-  },
-  {
-    path: '/main',
-    element: <MainPage />,
-  },
-  {
-    path: '/register',
-    element: <UserLoginForm/>
-  },
-  {
-    path: '/guestLogin',
-    element: <GuestSigninComponent/>
+    element: <App />,
+    children: [
+      {
+        path: '/',
+        element: <Navigate to="/login"/>,
+      },
+      {
+        path: '/login',
+        element: <LoginPage/>
+      },
+      {
+        path: '/main',
+        element: <MainPage />,
+      },
+      {
+        path: '/register',
+        element: <UserLoginForm/>
+      },
+      {
+        path: '/guestLogin',
+        element: <GuestSigninComponent/>
+      }
+    ]
+
   }
 ])
 
