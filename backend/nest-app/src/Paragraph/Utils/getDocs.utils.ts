@@ -34,6 +34,7 @@ export async function getUserDocs(
     .exec();
   const anonDocs = await paraModel.find({ type: 'guest' }).exec();
   const allDocs = [...docs, ...anonDocs];
+  console.log(allDocs, 'allDocs');
   const totalPages = Math.ceil((totalDocs + anonDocs.length) / perPage);
   if (page === Math.ceil((totalDocs + anonDocs.length) / perPage)) {
     return { docs: allDocs, totalPages: totalPages };

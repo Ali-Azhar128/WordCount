@@ -76,10 +76,11 @@ const Form = () => {
       setUrl(`http://localhost:3000${result.pdfDownloadLink}`);
       setData(result.pdfDownloadLink);
       setText("");
+      refetch();
     } catch (error) {
       setCount(0);
-      console.log(error.message);
-      toast.error(error.message);
+      console.log(error?.data?.message);
+      toast.error(error?.data?.message);
     }
   };
 
@@ -183,7 +184,7 @@ const Form = () => {
       refetch();
       getDocs();
     }
-  }, [sortOrder, loadingDocs, docs]);
+  }, [sortOrder]);
 
   return (
     <div className="h-[100%] flex flex-col items-center justify-center">
