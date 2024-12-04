@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import MuiButton from "./MuiButton";
 import { toast } from "react-toastify";
-import SearchField from "./SearchField";
 import PersistentDrawerLeft from "./Sidebar";
 import { useDispatch, useSelector } from "react-redux";
 import { setAllParas } from "../Slices/paragraphsSlice";
 import {
-  useGetAllParagraphsQuery,
   useAddParagraphMutation,
   useSearchParaWithPageNumberQuery,
   useFindByIDQuery,
@@ -22,7 +20,6 @@ const Form = () => {
   const [text, setText] = useState("");
   const [count, setCount] = useState(0);
   const [ip, setIp] = useState();
-  const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState("");
   const [data, setData] = useState("");
   const [paragraphs, setParagraphs] = useState([]);
@@ -35,14 +32,9 @@ const Form = () => {
 
   //redux
   const dispatch = useDispatch();
-  const paragraphsFromRedux = useSelector(
-    (state) => state.paragraphs.paragraphs
-  );
   const user = useSelector((state) => state.login.userInfo);
   const pageNumber = useSelector((state) => state.paragraphs.pageNumber);
-  const flaggedItem = useSelector((state) => state.paragraphs.flaggedItem);
   const userId = useSelector((state) => state.paragraphs.userId);
-  const paragraphId = useSelector((state) => state.paragraphs.paragraphId);
   const {
     data: docs,
     isLoading: loadingDocs,

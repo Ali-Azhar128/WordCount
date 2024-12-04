@@ -19,7 +19,6 @@ import { JwtAuthGuard } from '../Auth/jwt/jwt-auth.guard.js';
 import { Roles } from './Decorators/roles.decorator.js';
 import { RolesGuard } from '../Auth/jwt/roles.guard.js';
 import { RequestWithUser } from '../Auth/Interface/request-with-user.interface.js';
-import { findCorrectParaGuard } from './Guards/find-correct-para.guard.js';
 
 @Controller()
 export class ParaController {

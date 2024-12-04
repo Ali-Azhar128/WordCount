@@ -5,7 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidv4 } from 'uuid';
 import { userSignupDto } from 'src/users/userSignup.dto.js';
 import { guestUserSignInDto } from 'src/users/guestUserSignIn.dto.js';
-import { access } from 'fs';
+import { constants } from '../Constants/constants.js';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +31,7 @@ export class AuthService {
 
   async getPayloadFromToken(token: string): Promise<any> {
     return this.jwtService.verifyAsync(token, {
-      secret: process.env.JWT_SECRET || 'abc123',
+      secret: constants.jwtSecret,
     });
   }
 

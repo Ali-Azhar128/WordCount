@@ -28,7 +28,6 @@ import {
   Tooltip,
 } from "@mui/material";
 import {
-  useGetPageQuery,
   useSearchParaWithPageNumberQuery,
   useFlagItemMutation,
   useDeleteItemMutation,
@@ -37,7 +36,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import {
   setAllParas,
-  setFlaggedItem,
   setPageNumber,
   setParagraphId,
   setUserIdToSendNotificationTo,
@@ -147,12 +145,10 @@ export default function PersistentDrawerLeft({
   const socket = io("http://localhost:3000");
   const theme = useTheme();
   const [open, setOpen] = useState(false);
-  const [page, setPage] = useState(1);
   const [isAdmin, setIsAdmin] = useState(false);
   const [refetchData, setRefetchData] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
-  const [selectedText, setSelectedText] = useState(null);
 
   const openMenu = Boolean(anchorEl);
 
@@ -161,7 +157,6 @@ export default function PersistentDrawerLeft({
   const para = useSelector((state) => state.paragraphs.paragraphs);
   const user = useSelector((state) => state.login.userInfo);
   const pageNumber = useSelector((state) => state.paragraphs.pageNumber);
-  const userId = useSelector((state) => state.paragraphs.userId);
 
   const {
     data: searchResultsWithPage,
@@ -175,12 +170,9 @@ export default function PersistentDrawerLeft({
     userId: user.sub,
     role: user.role,
   });
-  const [flagItem, { isLoading: flagItemLoading, isError }] =
-    useFlagItemMutation();
-  const [deleteItem, { isLoading: deleteLoading, isError: deleteError }] =
-    useDeleteItemMutation();
-  const [toggleItem, { isLoading: toggleLoading, isError: toggleError }] =
-    useTogglePublicMutation();
+  const [flagItem] = useFlagItemMutation();
+  const [deleteItem] = useDeleteItemMutation();
+  const [toggleItem] = useTogglePublicMutation();
 
   // router-dom
   const navigate = useNavigate();
@@ -351,6 +343,10 @@ export default function PersistentDrawerLeft({
                       "&:hover": {
                         backgroundColor: theme.palette.primary.dark,
                       },
+                      display: {
+                        xs: "none",
+                        md: "block",
+                      },
                     }}
                   >
                     Analytics
@@ -362,6 +358,10 @@ export default function PersistentDrawerLeft({
                       color: theme.palette.primary.contrastText,
                       "&:hover": {
                         backgroundColor: theme.palette.primary.dark,
+                      },
+                      display: {
+                        xs: "none",
+                        md: "block",
                       },
                     }}
                   >
@@ -449,6 +449,7 @@ export default function PersistentDrawerLeft({
           <Divider />
           <ListContainer
             sx={{
+              overflowX: "hidden",
               "& .MuiButtonBase-root": {
                 paddingTop: "0px",
                 paddingBottom: "0px",

@@ -24,6 +24,7 @@ import { splitMixedText } from './Utils/text-utils.js';
 import { containsSpecialCharEng } from './Utils/token-utils.js';
 import { specialCharacters } from './Utils/special-characters.js';
 import { RequestWithUser } from '../Auth/Interface/request-with-user.interface.js';
+import { constants } from '../Constants/constants.js';
 
 interface Token {
   value: string;
@@ -141,11 +142,12 @@ export class ParaService {
     req: Request,
   ): Promise<any> {
     const token = extractTokenFromRequest(req);
+    console.log(token, 'token');
     if (!token) {
       throw new UnauthorizedException('Token not found');
     }
     const payload = await this.jwtService.verifyAsync(token, {
-      secret: process.env.JWT_SECRET || 'abc123',
+      secret: constants.jwtSecret,
     });
     const { role } = payload;
 

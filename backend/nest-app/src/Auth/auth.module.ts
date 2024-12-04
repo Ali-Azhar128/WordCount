@@ -6,13 +6,14 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from './jwt/jwt-auth.guard.js';
 import { RolesGuard } from './auth.guard.js';
+import { constants } from '../Constants/constants.js';
 
 @Module({
   imports: [
     UsersModule,
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_SECRET || 'abc123',
+      secret: constants.jwtSecret,
       signOptions: { expiresIn: '30d' },
     }),
   ],
