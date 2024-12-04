@@ -167,6 +167,8 @@ export default function PersistentDrawerLeft({
     data: searchResultsWithPage,
     isLoading: isLoadingWithPage,
     refetch,
+    isError: isErrorWithPage,
+    error: searchError,
   } = useSearchParaWithPageNumberQuery({
     keyword: search,
     page: pageNumber,
@@ -276,6 +278,15 @@ export default function PersistentDrawerLeft({
       console.log(searchResultsWithPage.docs, "total pages");
     }
   }, [searchResultsWithPage]);
+
+  useEffect(() => {
+    console.log(searchError, "searchError");
+    const error =
+      searchError?.data?.error === "Token not found"
+        ? searchError?.data?.error + ", Please login again."
+        : searchError?.data?.error;
+    toast.error(error);
+  }, [isErrorWithPage]);
 
   useEffect(() => {
     if (searchResultsWithPage) {
@@ -436,7 +447,14 @@ export default function PersistentDrawerLeft({
             />
           </div>
           <Divider />
-          <ListContainer>
+          <ListContainer
+            sx={{
+              "& .MuiButtonBase-root": {
+                paddingTop: "0px",
+                paddingBottom: "0px",
+              },
+            }}
+          >
             <List>
               {para.map((text, index) => (
                 <ListItem
