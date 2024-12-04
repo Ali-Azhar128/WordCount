@@ -39,6 +39,7 @@ import {
   setPageNumber,
   setParagraphId,
   setUserIdToSendNotificationTo,
+  updatePara,
   updateParagraphNotification,
 } from "../Slices/paragraphsSlice";
 import LanguageIcon from "@mui/icons-material/Language";
@@ -154,7 +155,7 @@ export default function PersistentDrawerLeft({
 
   // redux
   const dispatch = useDispatch();
-  const para = useSelector((state) => state.paragraphs.paragraphs);
+  let para = useSelector((state) => state.paragraphs.paragraphs);
   const user = useSelector((state) => state.login.userInfo);
   const pageNumber = useSelector((state) => state.paragraphs.pageNumber);
 
@@ -309,6 +310,20 @@ export default function PersistentDrawerLeft({
       socket.off("notificationStatusUpdate");
     };
   }, [dispatch, searchResultsWithPage]);
+
+  useEffect(() => {
+    const socket = io("http://localhost:3000");
+
+    socket.on("postUpdate", (updatedPost) => {
+      console.log(updatedPost, "updatedPost");
+      dispatch(updatePara(updatedPost));
+      refetch();
+    });
+
+    return () => {
+      socket.off("postUpdate");
+    };
+  }, []);
 
   return isLoadingWithPage ? (
     <div>Loading...</div>

@@ -239,6 +239,7 @@ export class ParaService {
     }
     doc.isPublic = !doc.isPublic;
     doc.save();
+    this.notificationGateway.sendPostUpdate(doc);
     return 'Document updated';
   }
 }

@@ -37,6 +37,12 @@ export const paragraphSlice = createSlice({
       console.log(state.paragraphs, "state.paragraphs");
     },
 
+    updatePara: (state, action) => {
+      console.log(action.payload, "socket payload id");
+      state.paragraphs = [...state.paragraphs, action.payload];
+      console.log(state.paragraphs, "para after");
+    },
+
     setPageNumber: (state, action) => {
       state.pageNumber = action.payload;
     },
@@ -74,6 +80,7 @@ export const {
   setFlaggedItem,
   setParagraphId,
   updateParagraphNotification,
+  updatePara,
 } = paragraphSlice.actions;
 
 export default paragraphSlice.reducer;
