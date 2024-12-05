@@ -16,7 +16,6 @@ export class AuthService {
 
   async signIn(userDto: userDto): Promise<{ access_token: string }> {
     const user = await this.userService.findOne(userDto);
-    console.log(user.role, 'user');
     const seed = uuidv4();
     const payload = {
       sub: user.id,

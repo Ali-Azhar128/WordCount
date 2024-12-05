@@ -155,7 +155,7 @@ export default function PersistentDrawerLeft({
 
   // redux
   const dispatch = useDispatch();
-  let para = useSelector((state) => state.paragraphs.paragraphs);
+  const para = useSelector((state) => state.paragraphs.paragraphs);
   const user = useSelector((state) => state.login.userInfo);
   const pageNumber = useSelector((state) => state.paragraphs.pageNumber);
 
@@ -192,14 +192,11 @@ export default function PersistentDrawerLeft({
   const toggleFlagItem = async (e, id, createdBy, flagged) => {
     e.stopPropagation();
     try {
-      console.log(createdBy, "createdBy");
       dispatch(setUserIdToSendNotificationTo({ createdBy, id }));
       const res = await flagItem(id).unwrap();
       dispatch(setParagraphId(id));
-      console.log(flagged, "text.isFlagged");
       toast.success(res);
       refetch();
-      console.log("here");
     } catch (error) {
       console.error(error?.data?.message, "error");
       toast.error(error?.data?.message);
@@ -207,7 +204,6 @@ export default function PersistentDrawerLeft({
   };
 
   const togglePublic = async () => {
-    console.log("clicked");
     try {
       const res = await toggleItem(selectedId).unwrap();
       toast.success(res);
@@ -267,13 +263,6 @@ export default function PersistentDrawerLeft({
   };
 
   useEffect(() => {
-    if (searchResultsWithPage) {
-      console.log(searchResultsWithPage.docs, "total pages");
-    }
-  }, [searchResultsWithPage]);
-
-  useEffect(() => {
-    console.log(searchError, "searchError");
     const error =
       searchError?.data?.error === "Token not found"
         ? searchError?.data?.error + ", Please login again."
@@ -283,9 +272,7 @@ export default function PersistentDrawerLeft({
 
   useEffect(() => {
     if (searchResultsWithPage) {
-      console.log(searchResultsWithPage.docs, "dataaaa");
       dispatch(setAllParas(searchResultsWithPage.docs));
-      console.log("data refetched");
     }
   }, [dispatch, refetchData, searchResultsWithPage]);
 
@@ -295,7 +282,6 @@ export default function PersistentDrawerLeft({
 
   useEffect(() => {
     socket.on("notificationStatusUpdate", (data) => {
-      console.log("Notification status update:", data);
       dispatch(
         updateParagraphNotification({
           id: data.id,
@@ -312,10 +298,7 @@ export default function PersistentDrawerLeft({
   }, [dispatch, searchResultsWithPage]);
 
   useEffect(() => {
-    const socket = io("http://localhost:3000");
-
     socket.on("postUpdate", (updatedPost) => {
-      console.log(updatedPost, "updatedPost");
       dispatch(updatePara(updatedPost));
       refetch();
     });

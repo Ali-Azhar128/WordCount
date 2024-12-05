@@ -15,7 +15,7 @@ import {
   useLoginMutation,
 } from "../../Slices/usersApiSlices";
 import { toast } from "react-toastify";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setLoginInfo } from "../../Slices/usersSlice";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -35,10 +35,8 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const user = { email, pass };
-    console.log(email + pass, "All data");
     try {
       const res = await login(user).unwrap();
-      console.log("Success login", res);
       localStorage.setItem("token", res.access_token);
       dispatch(setLoginInfo(res.user));
       navigate("/");

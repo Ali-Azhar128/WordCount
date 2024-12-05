@@ -82,10 +82,8 @@ export class ParaService {
     let tokens: string[] = [];
 
     const languageCode = franc(preprocessedParagraph);
-    console.log(languageCode, 'code');
     const languageObj = iso6392.find((lang) => lang.iso6392B === languageCode);
     const language = languageObj ? languageObj.name : 'unknown';
-    console.log(`Detected language: ${language}`);
 
     // Split the text into language segments
     const segments = splitMixedText(preprocessedParagraph);
@@ -111,7 +109,6 @@ export class ParaService {
       tokens = tokens.concat(englishTokens);
     }
 
-    console.log(tokens);
     let count = tokens.length;
 
     const savedPara = await this.paraDow.create({
@@ -142,7 +139,6 @@ export class ParaService {
     req: Request,
   ): Promise<any> {
     const token = extractTokenFromRequest(req);
-    console.log(token, 'token');
     if (!token) {
       throw new UnauthorizedException('Token not found');
     }

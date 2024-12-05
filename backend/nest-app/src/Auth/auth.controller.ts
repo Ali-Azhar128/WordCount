@@ -28,7 +28,6 @@ export class AuthController {
     @Res() res: Response,
   ) {
     try {
-      console.log(process.env.JWT_SECRET, 'JWT');
       const { access_token } = await this.authService.signIn(userDto);
       res.cookie('jwt', access_token, {
         httpOnly: true,
@@ -52,7 +51,6 @@ export class AuthController {
   ) {
     try {
       const payload = await this.authService.signUp(userSignupDto);
-      console.log(payload, 'user payload');
       return res.json(payload);
     } catch (error) {
       return res.status(400).json(error.message);

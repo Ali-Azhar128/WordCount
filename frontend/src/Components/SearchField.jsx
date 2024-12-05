@@ -43,21 +43,12 @@ const SearchField = ({ setParagraph }) => {
 
   useEffect(() => {
     if (paragraphsFromRedux.length > 0) {
-      console.log(paragraphsFromRedux, "from redux");
       getDocs();
     }
   }, [paragraphsFromRedux]);
 
-  useEffect(() => {
-    console.log(pageNumber, "pageNumber");
-    console.log(searchResultsWithPage, "searchResultsWithPage");
-  }, [searchResultsWithPage, pageNumber]);
-
   const handleOpen = async () => {
     setOpen(true);
-    // setLoading(true);
-    // await getDocs();
-    // setLoading(false);
   };
 
   const handleClose = () => {
@@ -73,7 +64,6 @@ const SearchField = ({ setParagraph }) => {
 
   const handleChange = (event, value) => {
     setSelectedValue(value);
-    console.log("selected value: ", value.para);
   };
 
   const handleSearch = (event) => {
@@ -101,7 +91,6 @@ const SearchField = ({ setParagraph }) => {
         renderInput={(params) => (
           <TextField
             onChange={(e) => {
-              console.log(e.target.value);
               handleSearch(e);
             }}
             {...params}

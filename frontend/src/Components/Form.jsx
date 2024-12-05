@@ -75,7 +75,6 @@ const Form = () => {
   };
 
   const getDocs = async () => {
-    console.log(docs, "docs");
     const sortedData =
       sortOrder === "asc"
         ? [...docs.docs].sort(
@@ -85,9 +84,7 @@ const Form = () => {
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
     setParagraphs(sortedData.map((r) => r.para));
-    console.log(sortedData, "sorted data");
     dispatch(setAllParas(sortedData));
-    console.log(docs, "docs api slice");
   };
 
   const handleLogoutGuest = () => {
@@ -119,7 +116,6 @@ const Form = () => {
       if (user) {
         let finalId = userId === "" ? user.sub : userId;
         socket.emit("join", finalId);
-        console.log("User connected to socket:", finalId);
       }
     };
 
@@ -169,7 +165,6 @@ const Form = () => {
   }, []);
 
   useEffect(() => {
-    console.log(docs, "docsss");
     if (docs) {
       refetch();
       getDocs();

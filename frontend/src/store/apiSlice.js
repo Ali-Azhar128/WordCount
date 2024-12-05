@@ -4,9 +4,9 @@ export const apiSlice = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:3000",
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token"); // Get the token from local storage
+      const token = localStorage.getItem("token");
       if (token) {
-        headers.set("Authorization", `Bearer ${token}`); // Attach the token to the Authorization header
+        headers.set("Authorization", `Bearer ${token}`);
       }
       return headers;
     },

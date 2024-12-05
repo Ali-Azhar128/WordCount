@@ -24,11 +24,9 @@ export class JwtAuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: constants.jwtSecret,
       });
-      console.log(payload, 'payload');
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
       request['user'] = payload; // attach user object after finding from db instead of attaching payload
-      console.log(request.user.sub, 'sub');
     } catch {
       throw new UnauthorizedException();
     }
@@ -37,7 +35,6 @@ export class JwtAuthGuard implements CanActivate {
 
   extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    console.log(request.cookies, 'cookies');
     if (type === 'Bearer' && token) {
       return token;
     }
